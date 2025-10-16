@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Benvenuto!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .button-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    button {
+      padding: 20px;
+      font-size: 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .section {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    input[type="text"], textarea, input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      font-size: 18px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background-color: #28a745;
+    }
+
+    .link-button {
+      background-color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Benvenuto!</h1>
+
+  <div class="button-grid">
+    <button onclick="showSection('photo')">📸 Pubblica una foto</button>
+    <button onclick="showSection('message')">📝 Scrivi una dedica</button>
+    <button onclick="window.open('https://docs.google.com/forms/d/e/IL_TUO_GOOGLE_FORM/viewform', '_blank')">📋 Lascia un feedback</button>
+    <button onclick="window.open('https://link-a-donazione.com', '_blank')">💸 Fai una donazione</button>
+  </div>
+
+  <!-- Sezione: Carica Foto -->
+  <div class="section" id="photo">
+    <h2>📸 Pubblica una foto</h2>
+    <form id="photoForm">
+      <label>Nome:</label>
+      <input type="text" id="photoName" required>
+
+      <label>Dedica:</label>
+      <textarea id="photoMessage" required></textarea>
+
+      <label>Foto:</label>
+      <input type="file" id="photoFile" accept="image/*" required>
+
+      <button type="submit" class="submit-btn">Invia</button>
+    </form>
+  </div>
+
+  <!-- Sezione: Solo Dedica -->
+  <div class="section" id="message">
+    <h2>📝 Scrivi una dedica</h2>
+    <form id="messageForm">
+      <label>Nome:</label>
+      <input type="text" id="msgName" required>
+
+      <label>Dedica:</label>
+      <textarea id="msgText" required></textarea>
+
+      <button type="submit" class="submit-btn">Invia</button>
+    </form>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <script>
+    // Mostra le sezioni
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+      document.getElementById(id).style.display = 'block';
+    }
+
+    // Firebase config (inserisci il tuo)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+      authDomain: "lotteria-bd6c9.firebaseapp.com",
+      databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lotteria-bd6c9",
+      storageBucket: "lotteria-bd6c9.appspot.com",
+      messagingSenderId: "606098477771",
+      appId: "1:606098477771:web:2c445353d3876c12c8014e",
+      measurementId: "G-VNYMKWRNTN"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
+
+    // Upload con foto
+    document.getElementById("photoForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("photoName").value.trim();
+      const message = document.getElementById("photoMessage").value.trim();
+      const file = document.getElementById("photoFile").files[0];
+
+      if (!file) return alert("Seleziona una foto.");
+
+      const id = Date.now();
+      const ref = storage.ref("uploads/" + id + "_" + file.name);
+      ref.put(file).then(snapshot => {
+        return snapshot.ref.getDownloadURL();
+      }).then(url => {
+        db.ref("uploads/" + id).set({
+          name,
+          message,
+          imageUrl: url,
+          status: "pending"
+        });
+        alert("Foto inviata con successo!");
+        document.getElementById("photoForm").reset();
+      }).catch(err => {
+        console.error(err);
+        alert("Errore durante l'invio.");
+      });
+    });
+
+    // Dedica senza foto
+    document.getElementById("messageForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const name = document.getElementById("msgName").value.trim();
+      const message = document.getElementById("msgText").value.trim();
+
+      const id = Date.now();
+      db.ref("uploads/" + id).set({
+        name,
+        message,
+        imageUrl: "",
+        status: "pending"
+      }).then(() => {
+        alert("Dedica inviata con successo!");
+        document.getElementById("messageForm").reset();
+      }).catch(err => {
+        console.error(err);
+        alert("Errore durante l'invio.");
+      });
+    });
+  </script>
+
+</body>
+</html>
