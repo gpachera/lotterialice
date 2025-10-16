@@ -1,160 +1,167 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <title>Inserimento Numero Lotteria</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            padding: 20px;
-        }
-
-        input[type=number] {
-            width: 100%;
-            padding: 20px;
-            font-size: 40pt;
-            margin: 8px 0;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
-            padding: 20px;
-            font-size: 30pt;
-            margin: 8px 0;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button.delete {
-            background-color: #e74c3c;
-        }
-
-        .container {
-            background-color: #f2f2f2;
-            border-radius: 10px;
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-        }
-
-        #current-number {
-            font-size: 60px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        #previous-numbers {
-            font-size: 20px;
-            color: #555;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        span.digit {
-            padding: 10px;
-            margin: 5px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            font-size: 40px;
-            display: inline-block;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Inserimento Numero Lotteria</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+    input[type=number], input[type=text] {
+      width: 100%;
+      padding: 20px;
+      font-size: 40pt;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 20px;
+      font-size: 30pt;
+      margin: 8px 0;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button.delete {
+      background-color: #e74c3c;
+    }
+    .container {
+      background-color: #f2f2f2;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    #current-number {
+      font-size: 60px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #previous-numbers {
+      font-size: 20px;
+      color: #555;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    span.digit {
+      padding: 10px;
+      margin: 5px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      font-size: 40px;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
 
-    <div id="current-number">Caricamento...</div>
-    <div id="previous-numbers">...</div>
+  <div id="current-number">Caricamento...</div>
+  <div id="previous-numbers">...</div>
 
-    <label for="input-number">Inserisci Numero:</label>
-    <input type="number" id="input-number" min="1" max="10000">
+  <label for="input-number">Inserisci Numero:</label>
 
-    <button onclick="updateNumber(event)">Aggiorna Numero</button>
-    <button class="delete" onclick="deleteNumber(event)">Elimina Numero</button>
+  <!-- Tastierino numerico iPhone con inputmode -->
+  <input
+    type="text"
+    id="input-number"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    autocomplete="off"
+    autofocus
+  >
+
+  <button onclick="updateNumber(event)">Aggiorna Numero</button>
+  <button class="delete" onclick="deleteNumber(event)">Elimina Numero</button>
+
 </div>
 
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
-        authDomain: "lotteria-bd6c9.firebaseapp.com",
-        databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
-        projectId: "lotteria-bd6c9",
-        storageBucket: "lotteria-bd6c9.firebasestorage.app",
-        messagingSenderId: "606098477771",
-        appId: "1:606098477771:web:2c445353d3876c12c8014e",
-        measurementId: "G-VNYMKWRNTN"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+    authDomain: "lotteria-bd6c9.firebaseapp.com",
+    databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lotteria-bd6c9",
+    storageBucket: "lotteria-bd6c9.firebasestorage.app",
+    messagingSenderId: "606098477771",
+    appId: "1:606098477771:web:2c445353d3876c12c8014e",
+    measurementId: "G-VNYMKWRNTN"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-    const input = document.getElementById('input-number');
-    const currentDiv = document.getElementById('current-number');
-    const previousDiv = document.getElementById('previous-numbers');
+  const input = document.getElementById('input-number');
+  const currentDiv = document.getElementById('current-number');
+  const previousDiv = document.getElementById('previous-numbers');
 
-    function updateNumber(e) {
-        e.preventDefault();
-        const newNumber = parseInt(input.value);
-        if (!isNaN(newNumber) && newNumber >= 1 && newNumber <= 10000) {
-            db.ref('lottery').once('value').then(snapshot => {
-                const data = snapshot.val() || { current: '*', previous: [] };
-                const prev = data.previous || [];
-                if (data.current !== '*') {
-                    prev.unshift(data.current);
-                    if (prev.length > 10) prev.pop();
-                }
-                db.ref('lottery').set({
-                    current: newNumber.toString(),
-                    previous: prev
-                });
-                input.value = "";
-            });
-        } else {
-            alert("Inserisci un numero valido tra 1 e 10000.");
-        }
+  function render(current, previousArray) {
+    currentDiv.innerHTML = '';
+    for (let i = 0; i < current.length; i++) {
+      currentDiv.innerHTML += `<span class="digit">${current[i]}</span>`;
     }
+    previousDiv.innerHTML = previousArray.length > 0 ? "Precedenti: " + previousArray.join(" | ") : "";
+  }
 
-    function deleteNumber(e) {
-        e.preventDefault();
-        db.ref('lottery').once('value').then(snapshot => {
-            const data = snapshot.val() || { current: '*', previous: [] };
-            const prev = data.previous || [];
-            const newCurrent = prev.length > 0 ? prev.shift() : '*';
-            db.ref('lottery').set({
-                current: newCurrent,
-                previous: prev
-            });
-        });
-    }
+  db.ref('lottery').on('value', snapshot => {
+    const data = snapshot.val() || { current: '*', previous: [] };
+    render(data.current || '*', data.previous || []);
+  });
 
-    function render(current, previousArray) {
-        // Mostra il numero attuale con le cifre separate
-        currentDiv.innerHTML = "";
-        for (let i = 0; i < current.length; i++) {
-            currentDiv.innerHTML += '<span class="digit">' + current[i] + '</span>';
-        }
-
-        // Mostra i numeri precedenti
-        previousDiv.innerHTML = previousArray.length > 0 ? "Precedenti: " + previousArray.join(" | ") : "";
-    }
-
-    // Aggiornamento in tempo reale
-    db.ref('lottery').on('value', snapshot => {
+  function updateNumber(e) {
+    e.preventDefault();
+    const newNumber = parseInt(input.value.trim());
+    if (!isNaN(newNumber) && newNumber >= 1 && newNumber <= 10000) {
+      db.ref('lottery').once('value').then(snapshot => {
         const data = snapshot.val() || { current: '*', previous: [] };
-        render(data.current || '*', data.previous || []);
+        const prev = data.previous || [];
+        if (data.current !== '*') {
+          prev.unshift(data.current);
+          if (prev.length > 10) prev.pop();
+        }
+        db.ref('lottery').set({
+          current: newNumber.toString(),
+          previous: prev
+        });
+        input.value = "";
+        input.focus(); // Riporta il focus per lasciare la tastiera aperta
+      });
+    } else {
+      alert("Inserisci un numero valido tra 1 e 10000.");
+    }
+  }
+
+  function deleteNumber(e) {
+    e.preventDefault();
+    db.ref('lottery').once('value').then(snapshot => {
+      const data = snapshot.val() || { current: '*', previous: [] };
+      const prev = data.previous || [];
+      const newCurrent = prev.length > 0 ? prev.shift() : '*';
+      db.ref('lottery').set({
+        current: newCurrent,
+        previous: prev
+      });
     });
+  }
+
+  // ✅ Invio da tastiera (Enter) aggiorna il numero
+  input.addEventListener("keydown", function(e) {
+    if (e.key === "Enter") {
+      updateNumber(e);
+    }
+  });
 </script>
 
 </body>
