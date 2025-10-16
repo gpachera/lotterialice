@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Moderazione Contenuti</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .card img {
+      max-width: 100%;
+      max-height: 300px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .actions {
+      margin-top: 10px;
+    }
+
+    .approve, .reject {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .approve {
+      background-color: #28a745;
+    }
+
+    .reject {
+      background-color: #dc3545;
+    }
+
+    .status {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+<script>
+  const PASSWORD = "alice123"; // <-- Cambia con la tua password
+
+  const input = prompt("Inserisci la password per accedere:");
+  if (input !== PASSWORD) {
+    document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>⛔ Accesso negato</h2>";
+    throw new Error("Accesso negato");
+  }
+</script>
+
+
+  <h1>👮‍♂️ Area Moderazione</h1>
+
+  <div id="content-list"></div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+      authDomain: "lotteria-bd6c9.firebaseapp.com",
+      databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lotteria-bd6c9",
+      storageBucket: "lotteria-bd6c9.appspot.com",
+      messagingSenderId: "606098477771",
+      appId: "1:606098477771:web:2c445353d3876c12c8014e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const contentList = document.getElementById("content-list");
+
+    function renderCard(id, data) {
+      const div = document.createElement("div");
+      div.className = "card";
+      div.id = "card-" + id;
+
+      let html = `
+        <div class="status">🕓 Stato: <strong>${data.status}</strong></div>
+        <div><strong>Nome:</strong> ${data.name || "N/D"}</div>
+        <div><strong>Dedica:</strong><br>${data.message || "—"}</div>
+      `;
+
+      if (data.imageUrl) {
+        html += `<img src="${data.imageUrl}" alt="Foto caricata">`;
+      }
+
+      html += `
+        <div class="actions">
+          <button class="approve" onclick="approve('${id}')">✅ Approva</button>
+          <button class="reject" onclick="reject('${id}')">❌ Rifiuta</button>
+        </div>
+      `;
+
+      div.innerHTML = html;
+      return div;
+    }
+
+    function loadSubmissions() {
+      db.ref("uploads").on("value", snapshot => {
+        contentList.innerHTML = "";
+        const uploads = snapshot.val();
+        if (!uploads) {
+          contentList.innerHTML = "<p>Nessun contenuto inviato.</p>";
+          return;
+        }
+
+        // Ordina per più recenti (chiave = timestamp)
+        const sorted = Object.entries(uploads).sort((a, b) => b[0] - a[0]);
+
+        sorted.forEach(([id, data]) => {
+          if (data.status !== "approved") {
+            const card = renderCard(id, data);
+            contentList.appendChild(card);
+          }
+        });
+      });
+    }
+
+    function approve(id) {
+      db.ref("uploads/" + id).update({ status: "approved" });
+    }
+
+    function reject(id) {
+      const confirmDelete = confirm("Vuoi davvero rifiutare questo contenuto?");
+      if (confirmDelete) {
+        db.ref("uploads/" + id).remove();
+        const el = document.getElementById("card-" + id);
+        if (el) el.remove();
+      }
+    }
+
+    loadSubmissions();
+  </script>
+
+</body>
+</html>
