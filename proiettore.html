@@ -14,7 +14,6 @@
       font-family: Arial, sans-serif;
       overflow: hidden;
     }
-
     .slideshow-container {
       width: 100%;
       height: 100%;
@@ -23,7 +22,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .slide {
       display: none;
       flex-direction: column;
@@ -31,7 +29,6 @@
       justify-content: center;
       text-align: center;
     }
-
     .slide img {
       max-width: 90vw;
       max-height: 70vh;
@@ -39,20 +36,17 @@
       border: 5px solid white;
       border-radius: 10px;
     }
-
     .text-box {
       margin-top: 20px;
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0,0,0,0.6);
       padding: 15px 30px;
       border-radius: 10px;
       max-width: 80vw;
     }
-
     .name {
       font-size: 36px;
       font-weight: bold;
     }
-
     .message {
       font-size: 24px;
       margin-top: 10px;
@@ -63,11 +57,9 @@
 
   <div class="slideshow-container" id="slideshow"></div>
 
-  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-    // Firebase config (già tuo)
     const firebaseConfig = {
       apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
       authDomain: "lotteria-bd6c9.firebaseapp.com",
@@ -99,22 +91,21 @@
       setInterval(() => {
         currentIndex = (currentIndex + 1) % slides.length;
         showSlide(currentIndex);
-      }, 6000); // Cambia ogni 6 secondi
+      }, 6000);
     }
 
     function renderSlides(data) {
       slides = Object.entries(data)
         .filter(([id, item]) => item.status === "approved")
-        .sort((a, b) => a[0] - b[0]); // ordinamento cronologico
+        .sort((a, b) => a[1].timestamp - b[1].timestamp);
 
-      slideshowContainer.innerHTML = ""; // pulisci
-
+      slideshowContainer.innerHTML = "";
       slides.forEach(([id, item]) => {
         const slide = document.createElement("div");
         slide.className = "slide";
 
         const img = document.createElement("img");
-        img.src = item.imageUrl || "https://via.placeholder.com/800x600.png?text=Nessuna+immagine";
+        img.src = item.imageUrl || "";
 
         const textBox = document.createElement("div");
         textBox.className = "text-box";
@@ -139,17 +130,12 @@
       showSlide(currentIndex);
     }
 
-    // Carica iniziale e aggiornamenti live
     db.ref("uploads").on("value", snapshot => {
-      const data = snapshot.val();
-      if (data) {
-        renderSlides(data);
-      }
+      const data = snapshot.val() || {};
+      renderSlides(data);
     });
 
-    window.onload = () => {
-      startSlideshow();
-    };
+    window.onload = startSlideshow;
   </script>
 
 </body>
