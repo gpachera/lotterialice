@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Proiezione Lotteria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
+        #current-number {
+            font-size: 160px;
+            font-weight: bold;
+            margin-bottom: 40px;
+        }
+        #previous-numbers {
+            font-size: 30px;
+            color: #666;
+        }
+        span {
+            padding: 20px;
+            margin: 5px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+<div id="current-number">
+    <span>*</span>
+    <span>*</span>
+    <span>*</span>
+    <span>*</span>
+</div>
+<div>
+    <div class="previous-numbers-title"><strong>Numeri precedenti:</strong></div>
+    <div id="previous-numbers">* | * | * | * | * | * | * | * | * | *</div>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+        authDomain: "lotteria-bd6c9.firebaseapp.com",
+        databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "lotteria-bd6c9",
+        storageBucket: "lotteria-bd6c9.firebasestorage.app",
+        messagingSenderId: "606098477771",
+        appId: "1:606098477771:web:2c445353d3876c12c8014e",
+        measurementId: "G-VNYMKWRNTN"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const currentDiv = document.getElementById('current-number');
+    const previousDiv = document.getElementById('previous-numbers');
+
+    function render(current, previousArray) {
+        currentDiv.innerHTML = "";
+        for (let i = 0; i < current.length; i++) {
+            currentDiv.innerHTML += '<span>' + current[i] + '</span>';
+        }
+        previousDiv.innerHTML = previousArray.join(" | ");
+    }
+
+    db.ref('lottery').on('value', snapshot => {
+        const data = snapshot.val() || { current: '*', previous: [] };
+        render(data.current || '*', data.previous || []);
+    });
+</script>
+
+</body>
+</html>
