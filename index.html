@@ -70,6 +70,16 @@
 
     .submit-btn {
       background-color: #28a745;
+      color: white;
+      font-size: 20px;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 20px;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background-color: #218838;
     }
 
     .link-button {
@@ -121,17 +131,14 @@
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
+  <script src("https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js">< /script>
   <script>
-    // Mostra le sezioni
     function showSection(id) {
       document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
       document.getElementById(id).style.display = 'block';
     }
 
-    // Firebase config (inserisci il tuo)
     const firebaseConfig = {
       apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
       authDomain: "lotteria-bd6c9.firebaseapp.com",
@@ -139,59 +146,62 @@
       projectId: "lotteria-bd6c9",
       storageBucket: "lotteria-bd6c9.appspot.com",
       messagingSenderId: "606098477771",
-      appId: "1:606098477771:web:2c445353d3876c12c8014e",
-      measurementId: "G-VNYMKWRNTN"
+      appId: "1:606098477771:web:2c445353d3876c12c8014e"
     };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     const storage = firebase.storage();
 
-    // Upload con foto
+    // Form upload foto
     document.getElementById("photoForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const name = document.getElementById("photoName").value.trim();
       const message = document.getElementById("photoMessage").value.trim();
       const file = document.getElementById("photoFile").files[0];
-
-      if (!file) return alert("Seleziona una foto.");
-
+      if (!file) {
+        alert("Seleziona una foto.");
+        return;
+      }
       const id = Date.now();
       const ref = storage.ref("uploads/" + id + "_" + file.name);
-      ref.put(file).then(snapshot => {
-        return snapshot.ref.getDownloadURL();
-      }).then(url => {
-        db.ref("uploads/" + id).set({
-          name,
-          message,
-          imageUrl: url,
-          status: "pending"
+      ref.put(file).then(snapshot => snapshot.ref.getDownloadURL())
+        .then(url => {
+          return db.ref("uploads/" + id).set({
+            name,
+            message,
+            imageUrl: url,
+            status: "pending",
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+          });
+        })
+        .then(() => {
+          alert("Foto inviata con successo! Attendiamo approvazione.");
+          document.getElementById("photoForm").reset();
+        })
+        .catch(err => {
+          console.error("Errore upload:", err);
+          alert("Errore durante l'invio.");
         });
-        alert("Foto inviata con successo!");
-        document.getElementById("photoForm").reset();
-      }).catch(err => {
-        console.error(err);
-        alert("Errore durante l'invio.");
-      });
     });
 
-    // Dedica senza foto
+    // Form dedica senza foto
     document.getElementById("messageForm").addEventListener("submit", function(e) {
       e.preventDefault();
       const name = document.getElementById("msgName").value.trim();
       const message = document.getElementById("msgText").value.trim();
-
       const id = Date.now();
       db.ref("uploads/" + id).set({
         name,
         message,
         imageUrl: "",
-        status: "pending"
+        status: "pending",
+        timestamp: firebase.database.ServerValue.TIMESTAMP
       }).then(() => {
-        alert("Dedica inviata con successo!");
+        alert("Dedica inviata con successo! Attendiamo approvazione.");
         document.getElementById("messageForm").reset();
       }).catch(err => {
-        console.error(err);
+        console.error("Errore dedica:", err);
         alert("Errore durante l'invio.");
       });
     });
