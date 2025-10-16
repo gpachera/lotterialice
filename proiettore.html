@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Slideshow Foto Approvate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .slideshow-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .slide img {
+      max-width: 90vw;
+      max-height: 70vh;
+      object-fit: contain;
+      border: 5px solid white;
+      border-radius: 10px;
+    }
+
+    .text-box {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 30px;
+      border-radius: 10px;
+      max-width: 80vw;
+    }
+
+    .name {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .message {
+      font-size: 24px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="slideshow-container" id="slideshow"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    // Firebase config (già tuo)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+      authDomain: "lotteria-bd6c9.firebaseapp.com",
+      databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "lotteria-bd6c9",
+      storageBucket: "lotteria-bd6c9.appspot.com",
+      messagingSenderId: "606098477771",
+      appId: "1:606098477771:web:2c445353d3876c12c8014e"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const slideshowContainer = document.getElementById("slideshow");
+    let slides = [];
+    let currentIndex = 0;
+
+    function showSlide(index) {
+      const allSlides = document.querySelectorAll('.slide');
+      allSlides.forEach(s => s.style.display = 'none');
+      if (allSlides[index]) {
+        allSlides[index].style.display = 'flex';
+      }
+    }
+
+    function startSlideshow() {
+      if (slides.length === 0) return;
+      showSlide(currentIndex);
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+      }, 6000); // Cambia ogni 6 secondi
+    }
+
+    function renderSlides(data) {
+      slides = Object.entries(data)
+        .filter(([id, item]) => item.status === "approved")
+        .sort((a, b) => a[0] - b[0]); // ordinamento cronologico
+
+      slideshowContainer.innerHTML = ""; // pulisci
+
+      slides.forEach(([id, item]) => {
+        const slide = document.createElement("div");
+        slide.className = "slide";
+
+        const img = document.createElement("img");
+        img.src = item.imageUrl || "https://via.placeholder.com/800x600.png?text=Nessuna+immagine";
+
+        const textBox = document.createElement("div");
+        textBox.className = "text-box";
+
+        const name = document.createElement("div");
+        name.className = "name";
+        name.textContent = item.name || "Anonimo";
+
+        const message = document.createElement("div");
+        message.className = "message";
+        message.textContent = item.message || "";
+
+        textBox.appendChild(name);
+        textBox.appendChild(message);
+        slide.appendChild(img);
+        slide.appendChild(textBox);
+
+        slideshowContainer.appendChild(slide);
+      });
+
+      currentIndex = 0;
+      showSlide(currentIndex);
+    }
+
+    // Carica iniziale e aggiornamenti live
+    db.ref("uploads").on("value", snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        renderSlides(data);
+      }
+    });
+
+    window.onload = () => {
+      startSlideshow();
+    };
+  </script>
+
+</body>
+</html>
