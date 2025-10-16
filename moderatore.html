@@ -10,12 +10,10 @@
       background-color: #f0f2f5;
       padding: 20px;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
     }
-
     .card {
       background-color: #fff;
       border-radius: 10px;
@@ -23,18 +21,15 @@
       margin-bottom: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     .card img {
       max-width: 100%;
       max-height: 300px;
       margin-bottom: 10px;
       display: block;
     }
-
     .actions {
       margin-top: 10px;
     }
-
     .approve, .reject {
       padding: 10px 20px;
       font-size: 16px;
@@ -44,15 +39,12 @@
       cursor: pointer;
       color: white;
     }
-
     .approve {
       background-color: #28a745;
     }
-
     .reject {
       background-color: #dc3545;
     }
-
     .status {
       font-size: 14px;
       font-weight: bold;
@@ -62,26 +54,21 @@
   </style>
 </head>
 <body>
-<script>
-  const PASSWORD = "alice123"; // <-- Cambia con la tua password
-
-  const input = prompt("Inserisci la password per accedere:");
-  if (input !== PASSWORD) {
-    document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>⛔ Accesso negato</h2>";
-    throw new Error("Accesso negato");
-  }
-</script>
-
+  <script>
+    const PASSWORD = "mod123";  // cambia con la tua
+    const inputPass = prompt("Inserisci password moderatore:");
+    if (inputPass !== PASSWORD) {
+      document.body.innerHTML = "<h2 style='text-align:center; margin-top:50px;'>⛔ Accesso negato</h2>";
+      throw new Error("Accesso negato");
+    }
+  </script>
 
   <h1>👮‍♂️ Area Moderazione</h1>
-
   <div id="content-list"></div>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script>
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
       authDomain: "lotteria-bd6c9.firebaseapp.com",
@@ -94,7 +81,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const contentList = document.getElementById("content-list");
 
     function renderCard(id, data) {
@@ -109,7 +95,7 @@
       `;
 
       if (data.imageUrl) {
-        html += `<img src="${data.imageUrl}" alt="Foto caricata">`;
+        html += `<img src="${data.imageUrl}" alt="Foto">`;
       }
 
       html += `
@@ -131,12 +117,9 @@
           contentList.innerHTML = "<p>Nessun contenuto inviato.</p>";
           return;
         }
-
-        // Ordina per più recenti (chiave = timestamp)
-        const sorted = Object.entries(uploads).sort((a, b) => b[0] - a[0]);
-
+        const sorted = Object.entries(uploads).sort((a, b) => b[1].timestamp - a[1].timestamp);
         sorted.forEach(([id, data]) => {
-          if (data.status !== "approved") {
+          if (data.status === "pending") {
             const card = renderCard(id, data);
             contentList.appendChild(card);
           }
@@ -149,16 +132,14 @@
     }
 
     function reject(id) {
-      const confirmDelete = confirm("Vuoi davvero rifiutare questo contenuto?");
-      if (confirmDelete) {
-        db.ref("uploads/" + id).remove();
-        const el = document.getElementById("card-" + id);
-        if (el) el.remove();
-      }
+      const ok = confirm("Rifiutare questo contenuto?");
+      if (!ok) return;
+      db.ref("uploads/" + id).remove();
+      const el = document.getElementById("card-" + id);
+      if (el) el.remove();
     }
 
     loadSubmissions();
   </script>
-
 </body>
 </html>
