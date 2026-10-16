@@ -37,7 +37,7 @@
   main { max-width: 720px; margin: 0 auto; padding: 14px 14px 20px; }
   .tab { display: none; } .tab.on { display: block; }
 
-  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
   nav.tabs button { background: none; color: var(--muted); border-radius: 0; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: .8rem; position: relative; }
   nav.tabs button svg { width: 26px; height: 26px; }
   nav.tabs button.on { color: var(--petrol); }
@@ -102,6 +102,17 @@
 
   #lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; padding: 10px; }
   #lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+  .sp-row { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+  .sp-row.off { opacity: .5; }
+  .sp-row img { width: 64px; height: 48px; object-fit: contain; background: #fff; border-radius: 8px; border: 1px solid var(--line); }
+  .sp-row .nm { font-weight: 800; line-height: 1.2; } .sp-row .nm small { display: block; color: var(--muted); font-weight: 600; }
+  .sp-acts { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr) auto; gap: 6px; }
+  .sp-acts button { min-height: 40px; font-size: .85rem; padding: 0 8px; background: #fff; color: var(--ink); border: 2px solid var(--line); }
+  .sp-acts button.on { background: var(--petrol); border-color: var(--petrol); color: #fff; }
+  .sp-acts button.gold.on { background: #C99A1B; border-color: #C99A1B; }
+  .sp-acts button.silver.on { background: #8A939B; border-color: #8A939B; }
+  .sp-acts .more { color: var(--red); }
+  .sp-form { display: grid; gap: 8px; }
   #toast { position: fixed; left: 12px; right: 12px; bottom: calc(86px + env(safe-area-inset-bottom)); z-index: 70; background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 14px; font-weight: 700; text-align: center; opacity: 0; pointer-events: none; transition: opacity .25s; max-width: 520px; margin: 0 auto; }
   #toast.on { opacity: 1; } #toast.err { background: var(--red); }
 </style>
@@ -193,6 +204,30 @@
         <div id="projState" class="muted">Controllo…</div>
       </div>
     </section>
+    <section class="tab" id="tab-sponsor">
+      <div class="box">
+        <h2>Sponsor</h2>
+        <p class="muted" style="margin:0 0 8px">I <b>Gold</b> escono più spesso sullo schermo e nel carosello, i <b>Silver</b> un po’ meno. Le modifiche valgono per chi riapre o ricarica la pagina (sul proiettore premi F5).</p>
+        <div class="muted" id="spCount"></div>
+      </div>
+      <div class="box">
+        <h2>Aggiungi uno sponsor</h2>
+        <div class="sp-form">
+          <input id="spName" placeholder="Nome" maxlength="80">
+          <input id="spLink" placeholder="Link (facoltativo): https://…" inputmode="url" maxlength="300">
+          <input id="spFile" type="file" accept="image/*">
+          <div class="seg" id="spTier">
+            <button data-t="gold">Gold</button><button data-t="silver">Silver</button><button data-t="standard" class="on">Standard</button>
+          </div>
+          <button id="spAdd" class="green">Aggiungi</button>
+        </div>
+      </div>
+      <div class="box">
+        <input id="spSearch" placeholder="Cerca sponsor…" style="margin-bottom:4px">
+        <div id="spList"><div class="empty">Carico…</div></div>
+      </div>
+    </section>
+
   </main>
 
   <nav class="tabs">
@@ -208,6 +243,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="2.5"/><path d="M8 20.5h8M12 16.5v4"/></svg>
       Schermo
     </button>
+    <button data-t="sponsor">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg>
+      Sponsor
+    </button>
   </nav>
 </div>
 
@@ -222,7 +261,7 @@
 (function () {
   'use strict';
   // ====== Impostazioni ======
-  const PASSWORD = '1234';          // <-- cambia qui la password della regia
+  const PASSWORD = '4426';          // <-- cambia qui la password della regia
   const firebaseConfig = {
     apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
     authDomain: "lotteria-bd6c9.firebaseapp.com",
@@ -249,7 +288,7 @@
 
   // ====== Accesso ======
   function enter() { $('login').classList.add('hidden'); $('app').classList.remove('hidden'); start(); }
-  $('loginBtn').onclick = () => { if ($('pwd').value === PASSWORD) { store('regia', '1'); enter(); } else toast('Password errata', true); };
+  $('loginBtn').onclick = () => { if ($('pwd').value === PASSWORD) { store('regia2', '1'); enter(); } else toast('Password errata', true); };
   $('pwd').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
 
   // ====== Schede ======
@@ -266,11 +305,97 @@
     firebase.initializeApp(firebaseConfig);
     firebase.firestore().settings({ experimentalAutoDetectLongPolling: true });
     fs = firebase.firestore(); rtdb = firebase.database();
-    firebase.auth().signInAnonymously().catch(e => console.error(e)).then(() => { startPhotos(); startLottery(); startScreen(); });
+    firebase.auth().signInAnonymously().catch(e => console.error(e)).then(() => { startPhotos(); startLottery(); startScreen(); startSponsors(); });
     rtdb.ref('.info/connected').on('value', s => { const c = $('conn'); c.textContent = s.val() ? 'Online' : 'Offline'; c.className = 'conn ' + (s.val() ? 'ok' : 'bad'); });
     const tick = () => { $('clock').textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); };
     tick(); setInterval(tick, 15000);
   }
+
+
+  // ====== SPONSOR ======
+  // Elenco base: loghi/loghi.json. Le scelte della regia stanno in RTDB: sponsors/cfg/<slug> {tier, hidden}
+  // e gli sponsor aggiunti qui in sponsors/extra/<id> {name, url, img, tier, hidden}.
+  let spBase = [], spCfg = {}, spExtra = {}, spTier = 'standard';
+  const TIER_LBL = { gold: 'Gold', silver: 'Silver', standard: 'Standard' };
+  const TIER_ORD = { gold: 0, silver: 1, standard: 2 };
+  async function startSponsors() {
+    try { const r = await fetch('loghi/loghi.json', { cache: 'no-cache' }); spBase = r.ok ? (await r.json()).filter(x => x && x.file) : []; } catch (e) { spBase = []; }
+    rtdb.ref('sponsors').on('value', s => { const v = s.val() || {}; spCfg = v.cfg || {}; spExtra = v.extra || {}; renderSponsors(); }, fail);
+    renderSponsors();
+  }
+  function spItems() {
+    const a = spBase.map(x => { const c = spCfg[x.slug] || {}; return { key: x.slug, extra: false, name: x.name, cat: x.categoria || '', src: 'loghi/' + encodeURIComponent(x.file), tier: c.tier || x.tier || 'standard', hidden: !!c.hidden }; });
+    Object.keys(spExtra).forEach(k => { const e = spExtra[k]; if (e) a.push({ key: k, extra: true, name: e.name || 'Senza nome', cat: 'Aggiunto dalla regia', src: e.img || '', tier: e.tier || 'standard', hidden: !!e.hidden }); });
+    return a;
+  }
+  function renderSponsors() {
+    const all = spItems(), q = $('spSearch').value.trim().toLowerCase();
+    const n = t => all.filter(x => !x.hidden && x.tier === t).length;
+    $('spCount').textContent = 'Gold ' + n('gold') + ' · Silver ' + n('silver') + ' · Standard ' + n('standard') + ' · Nascosti ' + all.filter(x => x.hidden).length;
+    const list = all.filter(x => !q || x.name.toLowerCase().includes(q))
+      .sort((a, b) => (a.hidden - b.hidden) || (TIER_ORD[a.tier] - TIER_ORD[b.tier]) || a.name.localeCompare(b.name, 'it'));
+    const box = $('spList'); box.textContent = '';
+    if (!list.length) { box.innerHTML = '<div class="empty">Nessuno sponsor trovato.</div>'; return; }
+    list.forEach(x => {
+      const row = document.createElement('div'); row.className = 'sp-row' + (x.hidden ? ' off' : '');
+      row.innerHTML = '<img alt=""><div class="nm"></div><div class="sp-acts"></div>';
+      row.querySelector('img').src = x.src;
+      const nm = row.querySelector('.nm'); nm.textContent = x.name; const sm = document.createElement('small'); sm.textContent = x.hidden ? 'Nascosto' : x.cat; nm.appendChild(sm);
+      const acts = row.querySelector('.sp-acts');
+      ['gold', 'silver', 'standard'].forEach(t => { const b = document.createElement('button'); b.className = t + (x.tier === t ? ' on' : ''); b.textContent = TIER_LBL[t]; b.onclick = () => spSet(x, { tier: t }); acts.appendChild(b); });
+      const more = document.createElement('button'); more.className = 'more'; more.textContent = x.extra ? 'Elimina' : (x.hidden ? 'Mostra' : 'Nascondi');
+      if (x.hidden && !x.extra) more.className = '';
+      more.onclick = () => {
+        if (x.extra) { if (confirm('Eliminare ' + x.name + '?')) rtdb.ref('sponsors/extra/' + x.key).remove().then(() => toast('Eliminato')).catch(fail); }
+        else spSet(x, { hidden: !x.hidden });
+      };
+      acts.appendChild(more);
+      box.appendChild(row);
+    });
+  }
+  function spSet(x, o) {
+    const path = 'sponsors/' + (x.extra ? 'extra/' : 'cfg/') + x.key;
+    if (o.hidden === false) o.hidden = null;           // null = rimuove il campo
+    rtdb.ref(path).update(o).then(() => toast('Salvato')).catch(fail);
+  }
+  $('spSearch').addEventListener('input', renderSponsors);
+  document.querySelectorAll('#spTier button').forEach(b => b.onclick = () => { spTier = b.dataset.t; document.querySelectorAll('#spTier button').forEach(x => x.classList.toggle('on', x === b)); });
+  function spImage(file) {   // ridimensiona il logo (max 400 px) e lo trasforma in data URL, senza blob:
+    return new Promise((res, rej) => {
+      const fr = new FileReader();
+      fr.onerror = () => rej(new Error('Non riesco a leggere il file'));
+      fr.onload = () => {
+        const im = new Image();
+        im.onerror = () => rej(new Error('Immagine non valida'));
+        im.onload = () => {
+          const k = Math.min(1, 400 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(im.width * k)); c.height = Math.max(1, Math.round(im.height * k));
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          let u = c.toDataURL('image/png');
+          if (u.length > 350000) u = c.toDataURL('image/webp', 0.88);
+          if (u.length > 600000) return rej(new Error('Logo troppo pesante, prova con un file più piccolo'));
+          res(u);
+        };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  $('spAdd').onclick = async () => {
+    const name = $('spName').value.trim(), file = $('spFile').files[0];
+    let link = $('spLink').value.trim();
+    if (!name) return toast('Scrivi il nome dello sponsor', true);
+    if (!file) return toast('Scegli il logo', true);
+    if (link && !/^https?:\/\//i.test(link)) link = 'https://' + link;
+    const btn = $('spAdd'); btn.disabled = true;
+    try {
+      const img = await spImage(file);
+      await rtdb.ref('sponsors/extra').push({ name, url: link || null, img, tier: spTier });
+      $('spName').value = ''; $('spLink').value = ''; $('spFile').value = '';
+      toast('Sponsor aggiunto');
+    } catch (e) { fail(e); }
+    btn.disabled = false;
+  };
 
   // ====== FOTO ======
   let PHOTO_LIMIT = 40, photos = [], filter = 'pending', firstSnap = true, unsubPhotos = null;
@@ -438,7 +563,7 @@
   $('skipBtn').onclick = () => { upd({ skip: Date.now() }); toast('Saltato'); };
 
   // Accesso automatico se la password è già stata inserita su questo telefono (va in fondo: serve che tutto sia definito)
-  if (load('regia') === '1') enter();
+  if (load('regia2') === '1') enter();
 })();
 </script>
 </body>

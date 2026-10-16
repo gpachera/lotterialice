@@ -262,7 +262,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   // ============ Impostazioni ============
   // Indirizzo che il QR code apre. Se lasci vuoto, usa la cartella di questa pagina
   // (es. https://tuosito.up.railway.app/ apre la pagina degli ospiti).
-  const GUEST_URL = '';
+  const GUEST_URL = 'https://www.ilsorrisodialice.it/';
 
   const PHOTO_TIME = 35000;   // durata di un saluto con foto
   const TEXT_TIME  = 25000;   // durata di un saluto senza foto
@@ -365,12 +365,26 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   // ============ Muro dei partner ============
   let logos = [], shownIdx = [], pool = [], cardOrder = [], flipTimer = null;
 
+
+  // ---- Sponsor: elenco base (loghi/loghi.json) + modifiche della regia (RTDB 'sponsors') ----
+  const SP_W = { gold: 3, silver: 2, standard: 1 };
+  const spShuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  async function loadSponsors(rt) {
+    let base = [];
+    try { const r = await fetch('loghi/loghi.json', { cache: 'no-cache' }); base = r.ok ? (await r.json()).map(x => typeof x === 'string' ? { name: x, file: x } : x) : []; } catch (e) {}
+    let d = {};
+    if (rt) { try { d = (await Promise.race([rt.ref('sponsors').once('value'), new Promise((_, j) => setTimeout(j, 3500))])).val() || {}; } catch (e) {} }
+    const cfg = d.cfg || {}, extra = d.extra || {}, out = [];
+    base.forEach(x => { if (!x.file) return; const c = cfg[x.slug] || {}; if (c.hidden) return;
+      out.push({ name: x.name || '', src: 'loghi/' + encodeURIComponent(x.file), link: x.url || null, tier: c.tier || x.tier || 'standard' }); });
+    Object.keys(extra).forEach(k => { const e = extra[k]; if (!e || e.hidden || !e.img) return;
+      out.push({ name: e.name || '', src: e.img, link: e.url || null, tier: e.tier || 'standard' }); });
+    return out;
+  }
+
   async function loadLogos() {
     try {
-      const resp = await fetch('loghi/loghi.json', { cache: 'no-cache' });
-      const raw = resp.ok ? await resp.json() : [];
-      logos = raw.map(x => typeof x === 'string' ? { name: x, file: x } : x).filter(x => x.file)
-        .map(x => ({ name: x.name || x.file, url: 'loghi/' + encodeURIComponent(x.file) }));
+      logos = (await loadSponsors(firebase.database())).map(s => ({ name: s.name || 'Sponsor', url: s.src, tier: s.tier }));
     } catch (e) {
       console.error('Errore caricamento loghi:', e);
     }
@@ -387,7 +401,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       grid.appendChild(d);
       return;
     }
-    shuffle(logos);
+    shuffle(logos); logos.sort((x, y) => (SP_W[y.tier] || 1) - (SP_W[x.tier] || 1));   // i gold entrano per primi nel muro
     const n = Math.min(TOTAL_CARDS, logos.length);
     const cols = n >= 10 ? 4 : n >= 5 ? 3 : 2;
     grid.style.setProperty('--cols', cols);
@@ -410,8 +424,12 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   function flipOne() {
     if (document.hidden) return;
     if (cardOrder.length === 0) cardOrder = shuffle(shownIdx.map((_, i) => i));
-    const ci = cardOrder.pop();
-    const incoming = pool.shift();
+    let ci = cardOrder.pop();
+    const keep = li => ({ gold: .6, silver: .3 }[logos[li].tier] || 0);   // i gold restano più a lungo sul muro
+    if (cardOrder.length && Math.random() < keep(shownIdx[ci])) { const alt = cardOrder.pop(); cardOrder.unshift(ci); ci = alt; }
+    let tot = pool.reduce((s, i) => s + (SP_W[logos[i].tier] || 1), 0), r = Math.random() * tot, k = 0;
+    for (; k < pool.length - 1; k++) { r -= SP_W[logos[pool[k]].tier] || 1; if (r < 0) break; }
+    const incoming = pool.splice(k, 1)[0];   // i gold tornano più spesso
     const outgoing = shownIdx[ci];
     pool.push(outgoing);
     shownIdx[ci] = incoming;

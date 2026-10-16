@@ -215,18 +215,36 @@
     </footer>
 
     <script>
-        // Carosello sponsor: legge loghi/loghi.json (voci con "file"); la serie è duplicata per un ciclo continuo
-        fetch('loghi/loghi.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : []).then(list => {
-            const files = list.map(x => typeof x === 'string' ? { name: '', file: x } : x).filter(x => x.file);
-            for (let i = files.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [files[i], files[j]] = [files[j], files[i]]; }
+        // Carosello sponsor: gold più volte, silver due, gli altri una; la serie è duplicata per un ciclo continuo
+        function buildCarousel(list) {
+            const seq = [];
+            list.forEach(s => { for (let i = 0; i < (SP_W[s.tier] || 1); i++) seq.push(s); });
+            spShuffle(seq);
+            for (let i = 1; i < seq.length; i++) if (seq[i] === seq[i - 1]) { const j = seq.findIndex((x, k) => k > i && x !== seq[i] && x !== seq[i + 1]); if (j > 0) [seq[i], seq[j]] = [seq[j], seq[i]]; }
             const box = document.getElementById('carouselContent');
-            [0, 1].forEach(() => files.forEach(x => {
+            [0, 1].forEach(() => seq.forEach(x => {
                 const im = document.createElement('img');
-                im.src = 'loghi/' + encodeURIComponent(x.file); im.alt = x.name || 'Sponsor';
+                im.src = x.src; im.alt = x.name || 'Sponsor';
                 im.onerror = () => { im.style.display = 'none'; };
                 box.appendChild(im);
             }));
-        }).catch(() => {});
+        }
+
+  // ---- Sponsor: elenco base (loghi/loghi.json) + modifiche della regia (RTDB 'sponsors') ----
+  const SP_W = { gold: 3, silver: 2, standard: 1 };
+  const spShuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  async function loadSponsors(rt) {
+    let base = [];
+    try { const r = await fetch('loghi/loghi.json', { cache: 'no-cache' }); base = r.ok ? (await r.json()).map(x => typeof x === 'string' ? { name: x, file: x } : x) : []; } catch (e) {}
+    let d = {};
+    if (rt) { try { d = (await Promise.race([rt.ref('sponsors').once('value'), new Promise((_, j) => setTimeout(j, 3500))])).val() || {}; } catch (e) {} }
+    const cfg = d.cfg || {}, extra = d.extra || {}, out = [];
+    base.forEach(x => { if (!x.file) return; const c = cfg[x.slug] || {}; if (c.hidden) return;
+      out.push({ name: x.name || '', src: 'loghi/' + encodeURIComponent(x.file), link: x.url || null, tier: c.tier || x.tier || 'standard' }); });
+    Object.keys(extra).forEach(k => { const e = extra[k]; if (!e || e.hidden || !e.img) return;
+      out.push({ name: e.name || '', src: e.img, link: e.url || null, tier: e.tier || 'standard' }); });
+    return out;
+  }
     </script>
 
     <!-- Firebase SDK -->
@@ -250,6 +268,7 @@
         // Inizializza Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        loadSponsors(db).then(buildCarousel).catch(() => {});
 
         // Riferimenti agli elementi DOM
         const currentDiv = document.getElementById('current-number');

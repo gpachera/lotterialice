@@ -460,26 +460,34 @@
     }
   }
 
+
+  // ---- Sponsor: elenco base (loghi/loghi.json) + modifiche della regia (RTDB 'sponsors') ----
+  const SP_W = { gold: 3, silver: 2, standard: 1 };
+  const spShuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  async function loadSponsors(rt) {
+    let base = [];
+    try { const r = await fetch('loghi/loghi.json', { cache: 'no-cache' }); base = r.ok ? (await r.json()).map(x => typeof x === 'string' ? { name: x, file: x } : x) : []; } catch (e) {}
+    let d = {};
+    if (rt) { try { d = (await Promise.race([rt.ref('sponsors').once('value'), new Promise((_, j) => setTimeout(j, 3500))])).val() || {}; } catch (e) {} }
+    const cfg = d.cfg || {}, extra = d.extra || {}, out = [];
+    base.forEach(x => { if (!x.file) return; const c = cfg[x.slug] || {}; if (c.hidden) return;
+      out.push({ name: x.name || '', src: 'loghi/' + encodeURIComponent(x.file), link: x.url || null, tier: c.tier || x.tier || 'standard' }); });
+    Object.keys(extra).forEach(k => { const e = extra[k]; if (!e || e.hidden || !e.img) return;
+      out.push({ name: e.name || '', src: e.img, link: e.url || null, tier: e.tier || 'standard' }); });
+    return out;
+  }
+
   async function loadPartnerLogos() {
     const grid = document.getElementById('partnersGrid');
     const status = document.getElementById('partnersStatus');
     try {
-      // elenco dei file in loghi/loghi.json (cartella ospitata con le pagine)
-      const resp = await fetch('loghi/loghi.json', { cache: 'no-cache' });
-      const raw = resp.ok ? await resp.json() : [];
-      // voci: o un nome file, oppure { name, file, url } (url = sito, altrimenti Maps, altrimenti vuoto)
-      const logos = raw.map(x => typeof x === 'string' ? { name: x, file: x, link: null } : { name: x.name || x.file, file: x.file, link: x.url || null })
-        .filter(x => x.file)
-        .map(x => ({ name: x.name, url: 'loghi/' + encodeURIComponent(x.file), link: x.link }));
+      const logos = (await loadSponsors(database)).map(s => ({ name: s.name, url: s.src, link: s.link, tier: s.tier }));
       if (!logos.length) {
         status.textContent = 'I loghi dei partner arriveranno presto.';
         return;
       }
 
-      for (let i = logos.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [logos[i], logos[j]] = [logos[j], logos[i]];
-      }
+      spShuffle(logos); logos.sort((x, y) => (SP_W[y.tier] || 1) - (SP_W[x.tier] || 1));   // gold in cima, poi silver, poi gli altri
 
       logos.forEach(logo => {
         const card = document.createElement(logo.link ? 'a' : 'div');
