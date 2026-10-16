@@ -157,6 +157,27 @@
   .v-logo .brandmark { position: relative; width: 58rem; max-width: 80%; height: auto; filter: drop-shadow(0 .2rem .8rem rgba(255,255,255,.85)); animation: floaty 9s ease-in-out infinite alternate; }
   @keyframes floaty { from { transform: translateY(-.5rem); } to { transform: translateY(.6rem); } }
   @media (prefers-reduced-motion: reduce) { .v-logo .brandmark { animation: none; } }
+  /* ---------- Titoli di coda: sponsor a sinistra, volontari che scorrono a destra ---------- */
+  #over[data-mode="credits"] .v-credits { display: flex; }
+  #over[data-mode="credits"] { background: #fff; color: var(--ink); }
+  .v-credits { flex-direction: row !important; align-items: stretch !important; justify-content: flex-start !important; padding: 0 !important; overflow: hidden; }
+  .v-credits #wcCanvas2 { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .cr-col { position: relative; height: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 2.2rem; }
+  .cr-spons { width: 27rem; margin-left: 3.2rem; }
+  .cr-vol { flex: 1; margin: 0 3.5rem 0 3rem; }
+  .cr-col h2 { font-size: 2rem; font-weight: 800; color: var(--petrol-d, #0F4A61); margin-bottom: .6rem; text-align: center; }
+  .cr-view { position: relative; flex: 1; width: 100%; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent); mask-image: linear-gradient(transparent, #000 7%, #000 93%, transparent); }
+  .cr-track { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+  .cr-sp { background: rgba(255,255,255,.86); border-radius: 1rem; height: 6rem; margin-bottom: 1rem; padding: .6rem 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 .2rem 1rem rgba(15,74,97,.08); }
+  .cr-sp.silver { height: 7.4rem; } .cr-sp.gold { height: 9.4rem; }
+  .cr-sp img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .cr-intro { text-align: center; padding: 3rem 0 1rem; }
+  .cr-intro img { width: 36rem; max-width: 90%; height: auto; }
+  .cr-intro p { font-size: 2.4rem; font-weight: 800; margin-top: 1.4rem; color: var(--petrol-d, #0F4A61); }
+  .cr-grp h3 { font-size: 2.7rem; font-weight: 800; text-align: center; margin: 3.4rem 0 1.1rem; color: var(--petrol-d, #0F4A61); }
+  .cr-names { column-count: 2; column-gap: 2.4rem; text-align: center; font-size: 1.85rem; font-weight: 700; line-height: 1.55; }
+  .cr-names div { break-inside: avoid; }
+  .cr-outro { text-align: center; font-size: 3.2rem; font-weight: 800; padding: 5rem 0 6rem; color: var(--petrol-d, #0F4A61); }
   .v-message svg { width: 5rem; height: 5rem; color: var(--coral, #E8704F); margin-bottom: 1.6rem; }
   .v-message .msg { font-size: 6.4rem; font-weight: 800; line-height: 1.1; max-width: 68rem; }
 
@@ -198,7 +219,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     <div class="stage" id="stage">
       <div class="waiting on" id="waiting">
         <h2>Lascia il tuo saluto</h2>
-        <p>Inquadra il codice con il telefono, scegli una foto e scrivi una dedica. Comparirà qui, sullo schermo.</p>
+        <p>Inquadra il codice con il telefono, scegli una foto e scrivi una dedica.</p>
         <div class="qr-box" id="qrBig"></div>
         <div class="url" id="urlText"></div>
       </div>
@@ -251,6 +272,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <section class="ov v-logo">
     <canvas id="wcCanvas" width="256" height="144"></canvas>
     <img class="brandmark" src="altro/logo-header.png" alt="Il sorriso di Alice">
+  </section>
+  <section class="ov v-credits">
+    <canvas id="wcCanvas2" width="256" height="144"></canvas>
+    <div class="cr-col cr-spons"><h2>Grazie ai nostri sponsor</h2><div class="cr-view"><div class="cr-track" id="crSpons"></div></div></div>
+    <div class="cr-col cr-vol"><div class="cr-view" style="margin-top:0"><div class="cr-track" id="crVol"></div></div></div>
   </section>
   <section class="ov v-message">
     <svg><use href="#ic-heart"/></svg>
@@ -608,6 +634,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       watchPending();
       if (!screen.paused && screen.mode === 'auto') runLoop();
     }, e => console.error('Comandi regia:', e));
+    rtdb.ref('credits').on('value', s => CR.set(s.val()));
     rtdb.ref('lottery').on('value', s => { lottery = normLottery(s.val()); renderLotteryView(); });
     const beat = () => rtdb.ref('screenStatus/last').set(Date.now()).catch(() => {});
     beat(); setInterval(beat, 10000);
@@ -628,7 +655,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   // fondono e scorrono piano, nelle tinte del logo (azzurro, acqua, lavanda, un velo di pesca). Gira solo con la pagina Logo attiva.
   const WC = (() => {
     const W = 256, H = 144;
-    const cv = $('wcCanvas'); if (!cv) return { sync() {} };
+    const cv = $('wcCanvas'), cv2 = $('wcCanvas2'); if (!cv) return { sync() {} };
     const ctx = cv.getContext('2d'), img = ctx.createImageData(W, H), px = img.data;
     const P = new Uint8Array(512); { const p = Array.from({ length: 256 }, (_, i) => i); for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; } for (let i = 0; i < 512; i++) P[i] = p[i & 255]; }
     const fade = t => t * t * t * (t * (t * 6 - 15) + 10), lerp = (a, b, t) => a + (b - a) * t;
@@ -659,9 +686,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         px[i++] = c[0]; px[i++] = c[1]; px[i++] = c[2]; px[i++] = 255;
       }
       ctx.putImageData(img, 0, 0);
+      if (cv2 && $('over').dataset.mode === 'credits') cv2.getContext('2d').drawImage(cv, 0, 0);
     }
     function sync() {
-      const on = $('over').classList.contains('on') && $('over').dataset.mode === 'logo' && !document.hidden;
+      const on = $('over').classList.contains('on') && ($('over').dataset.mode === 'logo' || $('over').dataset.mode === 'credits') && !document.hidden;
       if (on && !raf) { t0 = performance.now() - 20000; raf = requestAnimationFrame(frame); }
       else if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
     }
@@ -669,15 +697,78 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     return { sync };
   })();
 
+
+  // ============ Titoli di coda: sponsor che scorrono a sinistra, volontari a destra ============
+  // Dati dalla regia: RTDB credits = { speed: 'slow'|'medium'|'fast', groups: { id: { name, order, names: "uno per riga" } } }
+  const CR = (() => {
+    let data = {}, raf = 0, last = 0, left = null, right = null, active = false;
+    const SPEED = { slow: 2.0, medium: 3.0, fast: 4.4 };   // rem al secondo
+    const remPx = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+    function groups() {
+      const g = data.groups || {};
+      return Object.keys(g).map(id => g[id]).filter(x => x && x.names).sort((a, b) => (a.order || 0) - (b.order || 0))
+        .map(x => ({ name: x.name || '', names: String(x.names).split('\n').map(s => s.trim()).filter(Boolean) })).filter(x => x.names.length);
+    }
+    function build() {
+      const sp = $('crSpons'), vo = $('crVol'); sp.textContent = ''; vo.textContent = '';
+      // sponsor: gold in alto e più grandi
+      const list = (typeof logos !== 'undefined' ? logos : []).slice().sort((a, b) => (SP_W[b.tier] || 1) - (SP_W[a.tier] || 1));
+      const addAll = () => list.forEach(s => { const d = el('div', 'cr-sp ' + (s.tier || '')); const i = new Image(); i.alt = s.name || ''; i.src = s.url; d.appendChild(i); sp.appendChild(d); });
+      addAll();
+      // volontari
+      const intro = el('div', 'cr-intro'); const lg = new Image(); lg.src = 'altro/logo-header.png'; lg.alt = 'Il sorriso di Alice'; lg.onerror = () => lg.remove();
+      intro.appendChild(lg); intro.appendChild(el('p', '', 'Grazie a tutti i volontari')); vo.appendChild(intro);
+      groups().forEach(g => { const d = el('div', 'cr-grp'); d.appendChild(el('h3', '', g.name)); const n = el('div', 'cr-names'); g.names.forEach(x => n.appendChild(el('div', '', x))); d.appendChild(n); vo.appendChild(d); });
+      vo.appendChild(el('div', 'cr-outro', 'Grazie di cuore!'));
+      requestAnimationFrame(() => requestAnimationFrame(measure));   // dopo il layout
+    }
+    function measure() {
+      const sp = $('crSpons'), vo = $('crVol'), spView = sp.parentElement.clientHeight, voView = vo.parentElement.clientHeight;
+      const h1 = sp.scrollHeight;
+      left = { el: sp, y: 0, h: h1, view: spView, wrap: h1 > spView };
+      if (left.wrap) {   // si duplica l'elenco per un giro continuo
+        [...sp.children].forEach(c => sp.appendChild(c.cloneNode(true)));
+        left.h = h1;
+      }
+      right = { el: vo, y: voView, h: vo.scrollHeight, view: voView, pause: 0 };
+    }
+    function frame(now) {
+      raf = requestAnimationFrame(frame);
+      const dt = Math.min(.1, (now - last) / 1000); last = now;
+      const v = (SPEED[data.speed] || SPEED.medium) * remPx();
+      if (left) {
+        if (left.wrap) { left.y -= v * .6 * dt; if (left.y <= -left.h) left.y += left.h; }
+        left.el.style.transform = 'translate3d(0,' + left.y.toFixed(1) + 'px,0)';
+      }
+      if (right) {
+        if (right.pause > 0) right.pause -= dt;
+        else { right.y -= v * dt; if (right.y < -right.h) { right.pause = 4; right.y = right.view; } }
+        right.el.style.transform = 'translate3d(0,' + right.y.toFixed(1) + 'px,0)';
+      }
+    }
+    function sync() {
+      const on = $('over').classList.contains('on') && $('over').dataset.mode === 'credits' && !document.hidden;
+      if (on && !raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+      else if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+    }
+    document.addEventListener('visibilitychange', sync);
+    return {
+      set(d) { data = d || {}; if ($('over').dataset.mode === 'credits' && $('over').classList.contains('on')) build(); },
+      build, sync
+    };
+  })();
+
   function applyOverlay() {
     const o = $('over'), m = screen.mode;
-    if (m === 'auto') { o.classList.remove('on'); WC.sync(); return; }
+    if (m === 'auto') { o.classList.remove('on'); WC.sync(); CR.sync(); return; }
     o.dataset.mode = m;
     if (m === 'message') $('ovMsg').textContent = screen.message || '';
     if (m === 'partners') buildOverWall();
     if (m === 'lottery') renderLotteryView();
+    if (m === 'credits') CR.build();
     o.classList.add('on');
-    WC.sync();
+    WC.sync(); CR.sync();
   }
 
   function buildOverWall() {
