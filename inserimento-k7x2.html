@@ -65,6 +65,7 @@
 
 <div class="container">
 
+  <div id="status-line" style="text-align:center;font-weight:bold;font-size:20px;margin-bottom:10px"></div>
   <div id="current-number">Caricamento...</div>
   <div id="previous-numbers">...</div>
 
@@ -103,60 +104,93 @@
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
+
+  // ---- Modello lotteria condiviso: status + elenco completo dei numeri ----
+  // status: 'not_started' | 'live' | 'ended'; drawn: tutti i numeri in ordine di chiamata.
+  // current/previous restano scritti per compatibilità con lo schermo numeri.
+  function normLottery(d){
+    d = d || {};
+    let drawn = null;
+    if (Array.isArray(d.drawn)) drawn = d.drawn.slice();
+    else if (d.drawn && typeof d.drawn === 'object') drawn = Object.values(d.drawn);
+    if (!drawn) {
+      const prev = Array.isArray(d.previous) ? d.previous.slice().reverse() : [];
+      drawn = prev;
+      if (d.current && d.current !== '*' && d.current !== '****') drawn.push(d.current);
+    }
+    drawn = drawn.map(String);
+    let status = d.status;
+    if (['not_started','live','ended'].indexOf(status) < 0) status = drawn.length ? 'live' : 'not_started';
+    return { status: status, drawn: drawn };
+  }
+  function buildLottery(status, drawn){
+    return {
+      status: status,
+      drawn: drawn,
+      current: drawn.length ? drawn[drawn.length - 1] : '*',
+      previous: drawn.slice(0, -1).reverse().slice(0, 10)
+    };
+  }
+
   const input = document.getElementById('input-number');
   const currentDiv = document.getElementById('current-number');
   const previousDiv = document.getElementById('previous-numbers');
+  const statusLine = document.getElementById('status-line');
+  const STATUS_TEXT = { not_started: 'Non ancora iniziata', live: 'In corso', ended: 'Terminata' };
 
-  function render(current, previousArray) {
-    currentDiv.innerHTML = '';
+  function render(st) {
+    const current = st.drawn.length ? st.drawn[st.drawn.length - 1] : '*';
+    const prev = st.drawn.slice(0, -1).reverse().slice(0, 10);
+    statusLine.textContent = 'Stato lotteria: ' + STATUS_TEXT[st.status] + ' (' + st.drawn.length + ' numeri)';
+    currentDiv.textContent = '';
     for (let i = 0; i < current.length; i++) {
-      currentDiv.innerHTML += `<span class="digit">${current[i]}</span>`;
+      const sp = document.createElement('span');
+      sp.className = 'digit';
+      sp.textContent = current[i];
+      currentDiv.appendChild(sp);
     }
-    previousDiv.innerHTML = previousArray.length > 0 ? "Precedenti: " + previousArray.join(" | ") : "";
+    previousDiv.textContent = prev.length > 0 ? "Precedenti: " + prev.join(" | ") : "";
   }
 
-  db.ref('lottery').on('value', snapshot => {
-    const data = snapshot.val() || { current: '*', previous: [] };
-    render(data.current || '*', data.previous || []);
-  });
+  db.ref('lottery').on('value', snapshot => render(normLottery(snapshot.val())));
+
+  function mutate(fn) {
+    return db.ref('lottery').transaction(cur => {
+      const r = fn(normLottery(cur));
+      if (!r) return; // annulla
+      return buildLottery(r.status, r.drawn);
+    });
+  }
 
   function updateNumber(e) {
     e.preventDefault();
-    const newNumber = parseInt(input.value.trim());
-    if (!isNaN(newNumber) && newNumber >= 1 && newNumber <= 10000) {
-      db.ref('lottery').once('value').then(snapshot => {
-        const data = snapshot.val() || { current: '*', previous: [] };
-        const prev = data.previous || [];
-        if (data.current !== '*') {
-          prev.unshift(data.current);
-          if (prev.length > 10) prev.pop();
-        }
-        db.ref('lottery').set({
-          current: newNumber.toString(),
-          previous: prev
-        });
-        input.value = "";
-        input.focus(); // Riporta il focus per lasciare la tastiera aperta
-      });
-    } else {
+    const raw = input.value.trim();
+    const n = parseInt(raw, 10);
+    if (!/^\d+$/.test(raw) || isNaN(n) || n < 1 || n > 10000) {
       alert("Inserisci un numero valido tra 1 e 10000.");
+      return;
     }
+    const num = String(n);
+    mutate(st => {
+      if (st.status === 'ended') return null; // gestito sotto
+      return { status: 'live', drawn: st.drawn.concat(num) };
+    }).then(res => {
+      if (res.committed) return;
+      // lotteria terminata: chiedi se riaprirla
+      if (confirm('La lotteria risulta terminata. Riaprirla e aggiungere il numero ' + num + '?')) {
+        mutate(st => ({ status: 'live', drawn: st.drawn.concat(num) }));
+      }
+    });
+    input.value = "";
+    input.focus(); // Riporta il focus per lasciare la tastiera aperta
   }
 
   function deleteNumber(e) {
     e.preventDefault();
-    db.ref('lottery').once('value').then(snapshot => {
-      const data = snapshot.val() || { current: '*', previous: [] };
-      const prev = data.previous || [];
-      const newCurrent = prev.length > 0 ? prev.shift() : '*';
-      db.ref('lottery').set({
-        current: newCurrent,
-        previous: prev
-      });
-    });
+    mutate(st => st.drawn.length ? { status: st.status, drawn: st.drawn.slice(0, -1) } : null);
   }
 
-  // ✅ Invio da tastiera (Enter) aggiorna il numero
+  // Invio da tastiera (Enter) aggiorna il numero
   input.addEventListener("keydown", function(e) {
     if (e.key === "Enter") {
       updateNumber(e);

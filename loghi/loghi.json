@@ -1,0 +1,354 @@
+[
+ {
+  "name": "Comune di Sona",
+  "categoria": "Ente Pubblico Locale",
+  "zona": "Sona (VR)",
+  "slug": "comune-di-sona",
+  "file": "comune-di-sona.png",
+  "url": "https://www.comune.sona.vr.it"
+ },
+ {
+  "name": "Casa Molon",
+  "categoria": "Macelleria e Gastronomia",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "casa-molon",
+  "file": "casa-molon.png",
+  "url": "https://casamolon.it/"
+ },
+ {
+  "name": "La GrandeMela Shopping",
+  "categoria": "Centro Commerciale",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "la-grandemela-shopping",
+  "file": "la-grandemela-shopping.png",
+  "url": "https://www.lagrandemela.it"
+ },
+ {
+  "name": "Il Baco da Seta",
+  "categoria": "Testata Giornalistica Locale",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "il-baco-da-seta",
+  "file": "il-baco-da-seta.png",
+  "url": "https://www.ilbacodaseta.org"
+ },
+ {
+  "name": "Focus Italia Group",
+  "categoria": "Produzione e Distribuzione Biciclette",
+  "zona": "San Giovanni Lupatoto (VR)",
+  "slug": "focus-italia-group",
+  "file": "focus-italia-group.png",
+  "url": "https://www.focusitaliagroup.it"
+ },
+ {
+  "name": "Leoncini",
+  "categoria": "Salumificio / Prodotti Agroalimentari",
+  "zona": "Marano di Castenaso / VR",
+  "slug": "leoncini",
+  "file": "leoncini.png",
+  "url": "https://www.salumificioleoncini.it"
+ },
+ {
+  "name": "Levoni",
+  "categoria": "Salumi e Insaccati di Qualità",
+  "zona": "Nazionale",
+  "slug": "levoni",
+  "file": "levoni.png",
+  "url": "https://www.levoni.it"
+ },
+ {
+  "name": "Salumi Coati",
+  "categoria": "Salumificio Artigianale",
+  "zona": "Arbizzano di Negrar (VR)",
+  "slug": "salumi-coati",
+  "file": "salumi-coati.png",
+  "url": "https://www.salumificio-coati.it"
+ },
+ {
+  "name": "Perusi",
+  "categoria": "Commercio ingrosso Ortofrutta",
+  "zona": "Sona (VR)",
+  "slug": "perusi",
+  "file": "perusi.png",
+  "url": "https://www.perusi.it/"
+ },
+ {
+  "name": "Rossi Illuminazione",
+  "categoria": "Materiale Elettrico e Illuminazione",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "rossi-illuminazione",
+  "file": "rossi-illuminazione.png",
+  "url": "https://www.rossilight.it/"
+ },
+ {
+  "name": "Le Golosine",
+  "categoria": "Pasticceria / Panificio",
+  "zona": "Verona",
+  "slug": "le-golosine",
+  "file": "le-golosine.png",
+  "url": "https://maps.google.com/?q=Pasticceria+Le+Golosine+Lugagnano"
+ },
+ {
+  "name": "Pietropoli Serrande S.n.c.",
+  "categoria": "Produzione e Installazione Serrande",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "pietropoli-serrande-s-n-c",
+  "file": "pietropoli-serrande-s-n-c.png",
+  "url": "https://pietropoliserrande.it/"
+ },
+ {
+  "name": "Fasoli Impianti",
+  "categoria": "Impianti Termoidraulici",
+  "zona": "Sona / Lugagnano (VR)",
+  "slug": "fasoli-impianti",
+  "file": "fasoli-impianti.png",
+  "url": "https://www.fasoliimpianti.it/"
+ },
+ {
+  "name": "La Cascina",
+  "categoria": "Ristorante, Bisteccaria e Birreria",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "la-cascina",
+  "file": "la-cascina.png",
+  "url": "https://lacascinaristorantepizzeria.it/"
+ },
+ {
+  "name": "Gruppo Sinergia",
+  "categoria": "Servizi Logistici e Marketing",
+  "zona": "Verona",
+  "slug": "gruppo-sinergia",
+  "file": "gruppo-sinergia.png",
+  "url": "https://www.grupposinergia.net"
+ },
+ {
+  "name": "Pellini",
+  "categoria": "Torrefazione e Caffè",
+  "zona": "Bussolengo (VR)",
+  "slug": "pellini",
+  "file": "pellini.png",
+  "url": "https://www.pellinicaffe.com"
+ },
+ {
+  "name": "Real Noleggi",
+  "categoria": "Noleggio Piattaforme Aeree",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "real-noleggi",
+  "file": "real-noleggi.png",
+  "url": "https://www.realnoleggi.it/"
+ },
+ {
+  "name": "Panificio Mazzi Oreste e Figli",
+  "categoria": "Pasticceria Artigianale",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "panificio-mazzi-oreste-e-figli",
+  "file": "panificio-mazzi-oreste-e-figli.png",
+  "url": null
+ },
+ {
+  "name": "Club Enologico Culturale Lugagnano",
+  "categoria": "Associazione Culturale ed Enogastronomica",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "club-enologico-culturale-lugagnano",
+  "file": "club-enologico-culturale-lugagnano.png",
+  "url": null
+ },
+ {
+  "name": "Pro Loco Sona",
+  "categoria": "Associazione Promozione Territoriale",
+  "zona": "Sona (VR)",
+  "slug": "pro-loco-sona",
+  "file": "pro-loco-sona.png",
+  "url": "https://maps.google.com/?q=Pro+Loco+Sona+VR"
+ },
+ {
+  "name": "Studio Ing. Mauro Righetti",
+  "categoria": "Studio Tecnico di Ingegneria",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "studio-ing-mauro-righetti",
+  "file": "studio-ing-mauro-righetti.png",
+  "url": null
+ },
+ {
+  "name": "Ennegi Impianti",
+  "categoria": "Impianti Elettrici e Tecnologici",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "ennegi-impianti",
+  "file": "ennegi-impianti.png",
+  "url": "https://www.ennegiimpianti.vr.it/"
+ },
+ {
+  "name": "Venciu",
+  "categoria": "Azienda Agricola",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "venciu",
+  "file": "venciu.png",
+  "url": "https://www.venciu.it/"
+ },
+ {
+  "name": "Il Dono OdV",
+  "categoria": "Associazione di Volontariato",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "il-dono-odv",
+  "file": "il-dono-odv.png",
+  "url": "https://maps.google.com/?q=Il+Dono+OdV+Lugagnano+VR"
+ },
+ {
+  "name": "NOI Lugagnano",
+  "categoria": "Circolo Parrocchiale e Centro Giovanile",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "noi-lugagnano",
+  "file": "noi-lugagnano.png",
+  "url": "https://maps.google.com/?q=Circolo+NOI+Lugagnano+di+Sona"
+ },
+ {
+  "name": "Gioielleria Apostoli",
+  "categoria": "Gioielleria e Oreficeria",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "gioielleria-apostoli",
+  "file": "gioielleria-apostoli.png",
+  "url": "https://gioielleriaapostoli.it/"
+ },
+ {
+  "name": "Cantine di Verona",
+  "categoria": "Cooperativa Vitivinicola",
+  "zona": "Verona",
+  "slug": "cantine-di-verona",
+  "file": "cantine-di-verona.png",
+  "url": "https://www.cantinediverona.it"
+ },
+ {
+  "name": "Tatiana Bendazzoli Parrucchiera",
+  "categoria": "Prodotti e Servizi per il Benessere",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "tatiana-bendazzoli-parrucchiera",
+  "file": "tatiana-bendazzoli-parrucchiera.png",
+  "url": "https://www.facebook.com/tatianabendazzoli/"
+ },
+ {
+  "name": "La Patata Beer & Steakhouse",
+  "categoria": "Ristorante, Bisteccaria e Birreria",
+  "zona": "Sona (VR)",
+  "slug": "la-patata-beer-steakhouse",
+  "file": "la-patata-beer-steakhouse.png",
+  "url": "https://maps.google.com/?q=La+Patata+Beer+Steakhouse+Sona+VR"
+ },
+ {
+  "name": "A.S.D. Polisportiva Lugagnano",
+  "categoria": "Associazione Sportiva Dilettantistica",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "a-s-d-polisportiva-lugagnano",
+  "file": "a-s-d-polisportiva-lugagnano.png",
+  "url": "https://maps.google.com/?cid=11555148429645404712"
+ },
+ {
+  "name": "InstantLab Studio Fotografico",
+  "categoria": "Studio Fotografico Professionale",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "instantlab-studio-fotografico",
+  "file": "instantlab-studio-fotografico.png",
+  "url": "https://www.facebook.com/studiofotograficoInstantLab/"
+ },
+ {
+  "name": "Pane Arte",
+  "categoria": "Panificio e Focacceria Artigianale",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "pane-arte",
+  "file": "pane-arte.png",
+  "url": "https://maps.google.com/?cid=1971070562394655128"
+ },
+ {
+  "name": "Daniele Girelli Group",
+  "categoria": "Progettazione e Manutenzione Giardini",
+  "zona": "Sona / Verona",
+  "slug": "daniele-girelli-group",
+  "file": "daniele-girelli-group.png",
+  "url": "https://maps.google.com/?q=Daniele+Girelli+Group+Sona+VR"
+ },
+ {
+  "name": "Intermentum – dolci per istinto",
+  "categoria": "Pasticceria e Lievitati Artigianali",
+  "zona": "Stallavena / Grezzana (VR)",
+  "slug": "intermentum-dolci-per-istinto",
+  "file": "intermentum-dolci-per-istinto.png",
+  "url": "https://www.infermentum.it"
+ },
+ {
+  "name": "Zorzan Tendaggi",
+  "categoria": "Tende da sole, Tendaggi e Coperture",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "zorzan-tendaggi",
+  "file": "zorzan-tendaggi.png",
+  "url": "http://www.zorzantendaggi.com/"
+ },
+ {
+  "name": "Fattoria Ape Regina",
+  "categoria": "Azienda Agricola e Fattoria Didattica",
+  "zona": "Sona (VR)",
+  "slug": "fattoria-ape-regina",
+  "file": "fattoria-ape-regina.png",
+  "url": "http://www.fattoriaaperegina.it/"
+ },
+ {
+  "name": "GranTerre",
+  "categoria": "Gruppo Agroalimentare",
+  "zona": "Nazionale / Modena",
+  "slug": "granterre",
+  "file": "granterre.png",
+  "url": "https://www.granterre.it"
+ },
+ {
+  "name": "Gori Castioni Ingegneria",
+  "categoria": "Studio di Ingegneria e Progettazione",
+  "zona": "Verona",
+  "slug": "gori-castioni-ingegneria",
+  "file": "gori-castioni-ingegneria.png",
+  "url": "https://www.ingegneriagc.it/"
+ },
+ {
+  "name": "Artimago",
+  "categoria": "Tattoo & Art Studio",
+  "zona": "Verona e provincia",
+  "slug": "artimago",
+  "file": "artimago.png",
+  "url": "https://www.artimago.it"
+ },
+ {
+  "name": "Boscaini Scarpe",
+  "categoria": "Negozio di Calzature",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "boscaini-scarpe",
+  "file": "boscaini-scarpe.png",
+  "url": "https://www.boscainiscarpe.it/"
+ },
+ {
+  "name": "Cartolibreria Quintarelli",
+  "categoria": "Cartoleria e Articoli da Regalo",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "cartolibreria-quintarelli",
+  "file": "cartolibreria-quintarelli.png",
+  "url": "https://maps.google.com/?q=Cartolibreria+Quintarelli+Lugagnano+VR"
+ },
+ {
+  "name": "Azienda Agricola Zocca Natalino",
+  "categoria": "Produzione e Vendita Ortofrutta / Vino",
+  "zona": "Sona (VR)",
+  "slug": "azienda-agricola-zocca-natalino",
+  "file": "azienda-agricola-zocca-natalino.png",
+  "url": "https://maps.google.com/?q=Azienda+Agricola+Zocca+Natalino+Sona+VR"
+ },
+ {
+  "name": "Stefano Brutti",
+  "categoria": "Azienda Agricola",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "stefano-brutti",
+  "file": "stefano-brutti.png",
+  "url": "https://www.stefanobrutti.it/"
+ },
+ {
+  "name": "Andrea Stefanelli",
+  "categoria": "Salone da Barbiere / Parrucchiere Uomo",
+  "zona": "Lugagnano di Sona (VR)",
+  "slug": "andrea-stefanelli",
+  "file": "andrea-stefanelli.png",
+  "url": "https://www.facebook.com/p/Barbiere-Andrea-100027678079156/"
+ }
+]

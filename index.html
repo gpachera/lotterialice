@@ -1,158 +1,715 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lotteria - Partecipazione v2</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f5f5f5;
-      text-align: center;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#FFF7EE" />
+<title>Il sorriso di Alice – Pranzo di beneficenza</title>
 
-    h1 {
-      margin-bottom: 30px;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-    button {
-      font-size: 18px;
-      padding: 10px 20px;
-      margin: 10px;
-      cursor: pointer;
-    }
+<style>
+  :root {
+    --cream: #FFF7EE;
+    --sand: #F6E7D4;
+    --ink: #2F2A26;
+    --muted: #7A6E65;
+    --primary: #1C6E8C;
+    --primary-dark: #155670;
+    --primary-soft: #E3F1F6;
+    --coral: #E8704F;
+    --coral-dark: #D2583A;
+    --coral-soft: #FDE8E0;
+    --card: #FFFFFF;
+    --radius: 22px;
+    --shadow: 0 8px 28px rgba(90, 55, 25, 0.12);
+    --shadow-soft: 0 3px 12px rgba(90, 55, 25, 0.08);
+  }
 
-    .section {
-      display: none;
-      margin-top: 30px;
-    }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-    input[type="file"], input[type="text"], textarea {
-      font-size: 16px;
-      margin: 10px 0;
-      padding: 10px;
-      width: 90%;
-    }
+  body {
+    margin: 0;
+    padding: 20px 18px 40px;
+    min-height: 100vh;
+    font-family: 'Nunito', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--ink);
+    background-color: var(--cream);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 247, 238, 0.88);
+    z-index: -1;
+  }
 
-    .success {
-      color: green;
-      margin-top: 15px;
-    }
-  </style>
+  svg.i { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+  :focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+
+  .menu { max-width: 520px; margin: 0 auto; }
+
+  .hero { text-align: center; padding: 8px 4px 22px; }
+  .hero-logo { display: block; margin: 0 auto 14px; width: 100%; max-width: 420px; height: auto; }
+  .eyebrow {
+    display: inline-block; margin: 0 0 8px; padding: 5px 14px; border-radius: 999px;
+    background: var(--coral-soft); color: var(--coral-dark);
+    font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .hero h1 { margin: 6px 0 8px; font-size: 2rem; line-height: 1.15; font-weight: 800; }
+  .hero-text { margin: 0 auto; max-width: 440px; color: var(--muted); font-size: 1.02rem; }
+
+  .card-primary {
+    display: flex; align-items: center; gap: 16px; width: 100%;
+    padding: 22px 20px; border: 0; border-radius: 26px;
+    background: linear-gradient(135deg, #E8704F 0%, #F2A06B 100%);
+    color: #fff; text-align: left; font: inherit; cursor: pointer;
+    box-shadow: 0 12px 30px rgba(232, 112, 79, 0.35);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card-primary:active { transform: scale(0.985); }
+  .card-primary .badge { display: grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: rgba(255,255,255,0.24); flex: 0 0 auto; }
+  .card-primary .badge svg.i { width: 32px; height: 32px; }
+  .card-primary .t { display: block; font-size: 1.3rem; font-weight: 800; line-height: 1.2; }
+  .card-primary .s { display: block; margin-top: 4px; font-size: 0.95rem; opacity: 0.95; font-weight: 600; }
+  .card-primary .chev { margin-left: auto; width: 24px; height: 24px; opacity: 0.9; }
+
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .tile {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+    padding: 18px 16px; min-height: 118px; border: 0; border-radius: var(--radius);
+    background: var(--card); box-shadow: var(--shadow-soft); color: var(--ink);
+    font: inherit; font-weight: 800; font-size: 1.02rem; line-height: 1.2; text-align: left; cursor: pointer;
+    transition: transform .15s ease;
+  }
+  .tile:active { transform: scale(0.97); }
+  .tile .ic { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: var(--primary-soft); color: var(--primary); }
+  .tile:nth-child(2) .ic { background: var(--coral-soft); color: var(--coral-dark); }
+  .tile:nth-child(3) .ic { background: var(--sand); color: #9A6B3A; }
+
+  .donate {
+    display: flex; align-items: center; gap: 14px; padding: 18px 20px; border-radius: var(--radius);
+    background: var(--primary); color: #fff; text-decoration: none;
+    box-shadow: 0 10px 24px rgba(28, 110, 140, 0.3); transition: transform .15s ease;
+  }
+  .donate:active { transform: scale(0.985); }
+  .donate .ic { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+  .donate .ic svg.i { fill: rgba(255,255,255,0.25); }
+  .donate .t { display: block; font-weight: 800; font-size: 1.1rem; line-height: 1.2; }
+  .donate .s { display: block; font-size: 0.9rem; opacity: 0.92; font-weight: 600; }
+  .donate .ext { margin-left: auto; width: 22px; height: 22px; opacity: 0.85; }
+
+  .thanks { text-align: center; color: var(--muted); font-size: 0.92rem; margin: 26px 10px 0; }
+
+  .back-button {
+    position: fixed; top: 14px; left: 14px; z-index: 1000; display: none; align-items: center; gap: 6px;
+    padding: 10px 16px 10px 12px; border: 0; border-radius: 999px;
+    background: rgba(255,255,255,0.95); color: var(--primary-dark);
+    font: inherit; font-weight: 800; font-size: 0.95rem; box-shadow: var(--shadow); cursor: pointer;
+  }
+  .back-button svg.i { width: 20px; height: 20px; stroke-width: 2.4; }
+
+  .section { display: none; max-width: 520px; margin: 0 auto; padding: 64px 0 8px; }
+  .section-card { background: var(--card); border-radius: 26px; padding: 26px 20px 22px; box-shadow: var(--shadow); }
+  .section h2 { margin: 0 0 6px; font-size: 1.55rem; line-height: 1.2; font-weight: 800; }
+  .section-intro { margin: 0 0 18px; color: var(--muted); font-size: 0.98rem; }
+
+  .btn {
+    display: block; width: 100%; margin: 12px 0 0; padding: 16px; border: 0; border-radius: 16px;
+    background: var(--coral); color: #fff; font: inherit; font-weight: 800; font-size: 1.05rem; cursor: pointer;
+    box-shadow: 0 8px 18px rgba(232, 112, 79, 0.3); transition: transform .12s ease, background .2s ease;
+  }
+  .btn:active { transform: scale(0.985); }
+  .btn:hover { background: var(--coral-dark); }
+  .btn:disabled { background: #B8AEA6; box-shadow: none; cursor: not-allowed; }
+  .btn-secondary { background: var(--sand); color: var(--ink); box-shadow: none; }
+  .btn-secondary:hover { background: #EEDCC4; }
+
+  label.field { display: block; margin: 16px 0 6px; font-weight: 800; font-size: 0.95rem; }
+  input[type="text"], textarea {
+    width: 100%; padding: 14px 16px; border: 2px solid #EBDDCB; border-radius: 14px;
+    background: #FFFDF9; color: var(--ink); font: inherit; font-size: 16px;
+  }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--primary); background: #fff; }
+  textarea { resize: vertical; min-height: 110px; }
+
+  input[type="file"] { display: none; }
+  .file-drop {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 22px 12px; border: 2px dashed var(--coral); border-radius: 18px;
+    background: var(--coral-soft); color: var(--coral-dark); font-weight: 800; font-size: 1.05rem; text-align: center; cursor: pointer;
+  }
+  .file-drop svg.i { width: 34px; height: 34px; }
+  .file-drop.has-file { border-style: solid; border-color: #3C9A6B; background: #E6F5ED; color: #1E6B45; }
+  #filePreview { display: none; width: 100%; max-height: 240px; object-fit: cover; border-radius: 16px; margin-top: 12px; box-shadow: var(--shadow-soft); }
+  .file-name { margin-top: 8px; text-align: center; color: var(--muted); font-size: 0.85rem; word-break: break-word; }
+  .hint { margin: 10px 0 0; text-align: center; color: var(--muted); font-size: 0.88rem; }
+
+  .loader { display: none; width: 38px; height: 38px; margin: 18px auto 6px; border: 4px solid var(--sand); border-top-color: var(--coral); border-radius: 50%; animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { display: none; text-align: center; color: var(--coral-dark); font-weight: 800; margin-bottom: 6px; }
+  .progress-bar-container { display: none; width: 100%; height: 24px; margin: 10px 0; border-radius: 12px; background: var(--sand); overflow: hidden; }
+  .progress-bar { display: flex; align-items: center; justify-content: center; width: 0%; height: 100%; background: linear-gradient(90deg, var(--coral), #F2A06B); color: #fff; font-weight: 800; font-size: 0.8rem; transition: width .3s ease; }
+
+  .success { text-align: center; padding: 10px 4px 0; }
+  .success[hidden] { display: none; }
+  .success .ok { display: grid; place-items: center; width: 76px; height: 76px; margin: 6px auto 14px; border-radius: 50%; background: #E6F5ED; color: #2E8B5E; }
+  .success .ok svg.i { width: 40px; height: 40px; stroke-width: 2.4; }
+  .success p { margin: 0 0 8px; color: var(--muted); }
+
+  iframe { width: 100%; height: 640px; border: 0; border-radius: 14px; background: #fff; }
+
+  .menu-course { margin: 0; padding: 14px 0; border-bottom: 1px dashed #E7D5BE; }
+  .course-title { font-weight: 800; font-size: 1.08rem; color: #8B4A1F; }
+  .course-description { margin-top: 2px; color: #5D4A3C; font-size: 1rem; }
+  .course-sub { color: var(--muted); font-size: 0.92rem; font-style: italic; }
+  .menu-wine { margin-top: 12px; padding: 16px; border-radius: 18px; background: #F8E6E8; text-align: center; }
+  .wine-title { font-weight: 800; color: #7A2E3A; margin-bottom: 4px; }
+  .wine-list { color: #7A2E3A; font-size: 0.98rem; }
+
+  .lottery-live { text-align: center; }
+  .lottery-current { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; min-height: 96px; margin: 14px 0 6px; }
+  .lottery-current span {
+    min-width: 52px; padding: 12px 10px; border-radius: 16px;
+    background: linear-gradient(160deg, #FFFFFF, #FFF1E3); box-shadow: var(--shadow-soft);
+    color: var(--coral-dark); font-size: 52px; font-weight: 800; line-height: 1.1;
+  }
+  .lottery-inactive { padding: 28px 12px; color: var(--muted); font-size: 1.15rem; font-weight: 700; }
+  .lottery-previous { margin-top: 22px; padding-top: 18px; border-top: 2px dashed #EBDDCB; }
+  .lottery-previous-title { margin-bottom: 12px; font-weight: 800; color: var(--muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em; }
+  .lottery-previous-numbers { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+  .lottery-previous-number { display: inline-flex; gap: 3px; padding: 6px 8px; border-radius: 12px; background: var(--sand); }
+  .lottery-previous-number span { min-width: 20px; font-size: 1.15rem; font-weight: 800; color: #6B4E34; text-align: center; }
+
+  .lottery-ended { padding: 22px 12px; color: var(--primary-dark); font-size: 1.25rem; font-weight: 800; line-height: 1.3; }
+  .lottery-ended small { display: block; margin-top: 6px; color: var(--muted); font-size: 0.95rem; font-weight: 600; }
+  .lottery-status { display: inline-block; margin-bottom: 4px; padding: 4px 12px; border-radius: 999px; background: #E6F5ED; color: #1E6B45; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+  .draw-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .draw-chip { min-width: 54px; padding: 7px 12px; border-radius: 999px; background: var(--sand); color: #6B4E34; font-size: 1.05rem; font-weight: 800; text-align: center; }
+  .draw-chip.is-last { background: var(--coral); color: #fff; box-shadow: 0 4px 10px rgba(232,112,79,0.3); }
+
+  .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; margin-top: 14px; }
+  .partner-card { display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; padding: 10px; border-radius: 16px; background: #fff; border: 1px solid #F0E3D2; box-shadow: var(--shadow-soft); }
+  a.partner-card { text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
+  a.partner-card:active { transform: scale(.97); }
+  a.partner-card:focus-visible { outline: 3px solid var(--petrol, #1C6E8C); outline-offset: 2px; }
+  .partner-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .partners-status { text-align: center; color: var(--muted); margin: 16px 0 0; }
+
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 1.7rem; }
+    .lottery-current span { font-size: 44px; min-width: 44px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation-duration: 0.01ms !important; } }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-  <h1>Benvenuto! Scegli un'opzione:</h1>
+<button class="back-button" id="backButton" onclick="backToMenu()" aria-label="Torna al menu">
+  <svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+  <span>Indietro</span>
+</button>
 
-  <div>
-    <button onclick="showSection('photo')">📸 Pubblica una foto</button>
-    <button onclick="showSection('dedica')">💬 Pubblica una dedica</button>
-    <button onclick="window.open('https://forms.gle/tuo-link-google-form', '_blank')">📝 Feedback</button>
-    <button onclick="window.open('https://link-donazione.com', '_blank')">💖 Fai una donazione</button>
+<main class="menu" id="menu">
+  <header class="hero">
+    <img class="hero-logo" src="altro/logo-header.png" alt="Il sorriso di Alice" onerror="this.style.display='none'" />
+    <span class="eyebrow">Pranzo di beneficenza</span>
+    <h1>Grazie di essere qui</h1>
+    <p class="hero-text">Oggi ogni gesto conta: un pranzo condiviso, un biglietto, un saluto. Insieme, a favore della Lega Italiana Fibrosi Cistica, regaliamo un respiro in più a chi convive con la fibrosi cistica.</p>
+  </header>
+
+  <button class="card-primary" onclick="showSection('uploadSection')">
+    <span class="badge">
+      <svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </span>
+    <span>
+      <span class="t">Condividi un saluto</span>
+      <span class="s">Una foto e una dedica: le vedrai comparire sullo schermo della sala</span>
+    </span>
+    <svg class="i chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+
+  <div class="tiles">
+    <button class="tile" onclick="showSection('menuSection')">
+      <span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M7 3v7a2 2 0 0 1-4 0V3M5 3v18M17 3c-2.2 1.4-3 3.8-3 7h3v11"/></svg></span>
+      Menu del pranzo
+    </button>
+    <button class="tile" onclick="showSection('lotterySection')">
+      <span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M3 9a2 2 0 0 0 0 6v3a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1v-3a2 2 0 0 1 0-6V6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1z"/><path d="M14 5v14" stroke-dasharray="2 2.5"/></svg></span>
+      Lotteria
+    </button>
+    <button class="tile" onclick="showSection('partnersSection')">
+      <span class="ic"><svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.8.2 5 2.4 5 5.3"/></svg></span>
+      I nostri partner
+    </button>
+    <button class="tile" onclick="showSection('feedbackSection')">
+      <span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
+      Dicci cosa ne pensi
+    </button>
   </div>
 
-  <!-- 📸 SEZIONE UPLOAD FOTO -->
-  <div id="photo" class="section">
-    <h2>Carica una foto</h2>
-    <form id="photoForm">
-      <input type="text" id="photoName" placeholder="Il tuo nome" required /><br/>
-      <textarea id="photoDedica" placeholder="Scrivi una dedica..." rows="3" required></textarea><br/>
-      <input type="file" id="photoFile" accept="image/*" required /><br/>
-      <button type="submit">Invia</button>
-    </form>
-    <div id="photoSuccess" class="success"></div>
-  </div>
+  <a class="donate" href="https://dona.fibrosicistica.it/" target="_blank" rel="noopener noreferrer">
+    <span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+    <span>
+      <span class="t">Fai una donazione</span>
+      <span class="s">Sostieni la Lega Italiana Fibrosi Cistica</span>
+    </span>
+    <svg class="i ext" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+  </a>
 
-  <!-- 💬 SEZIONE DEDICA -->
-  <div id="dedica" class="section">
-    <h2>Scrivi una dedica</h2>
-    <form id="dedicaForm">
-      <input type="text" id="dedicaName" placeholder="Il tuo nome" required /><br/>
-      <textarea id="dedicaText" placeholder="Scrivi la tua dedica..." rows="3" required></textarea><br/>
-      <button type="submit">Invia</button>
-    </form>
-    <div id="dedicaSuccess" class="success"></div>
-  </div>
+  <p class="thanks">Grazie ai nostri partner e a chi ha reso possibile questa giornata.</p>
+</main>
 
-  <!-- ✅ SCRIPT -->
-  <script>
-    // Mostra la sezione selezionata
-    function showSection(id) {
-      document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-      document.getElementById(id).style.display = 'block';
+<div id="uploadSection" class="section">
+  <div class="section-card">
+    <div id="uploadForm">
+      <h2>Condividi un saluto</h2>
+      <p class="section-intro">Scrivi una dedica per gli ospiti: dopo l'approvazione comparirà sullo schermo della sala.</p>
+
+      <label for="fileInput" class="file-drop" id="fileLabel">
+        <svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span id="fileLabelText">Aggiungi una foto</span>
+      </label>
+      <input type="file" id="fileInput" accept="image/*" onchange="updateFileName()" />
+      <img id="filePreview" alt="Anteprima della foto scelta" />
+      <div class="file-name" id="fileName"></div>
+      <p class="hint">Con una foto il tuo saluto è ancora più bello da vedere.</p>
+
+      <label class="field" for="nameInput">Il tuo nome</label>
+      <input type="text" id="nameInput" placeholder="Come ti chiami?" maxlength="60" autocomplete="given-name" />
+
+      <label class="field" for="dedicaInput">La tua dedica</label>
+      <textarea id="dedicaInput" rows="4" placeholder="Scrivi qui il tuo messaggio" maxlength="300"></textarea>
+
+      <div class="loader" id="loader"></div>
+      <div class="loading-text" id="loadingText">Sto inviando il tuo saluto...</div>
+      <div class="progress-bar-container" id="progressContainer">
+        <div class="progress-bar" id="progressBar">0%</div>
+      </div>
+
+      <button class="btn" onclick="upload()" id="uploadBtn">Invia il saluto</button>
+      <button class="btn btn-secondary" onclick="closeSection('uploadSection')">Annulla</button>
+    </div>
+
+    <div id="uploadSuccess" class="success" hidden>
+      <div class="ok"><svg class="i" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h2>Grazie!</h2>
+      <p>Il tuo saluto è arrivato. Comparirà sullo schermo non appena sarà approvato.</p>
+      <button class="btn" onclick="resetUploadForm()">Invia un altro saluto</button>
+      <button class="btn btn-secondary" onclick="closeSection('uploadSection')">Torna al menu</button>
+    </div>
+  </div>
+</div>
+
+<div id="feedbackSection" class="section">
+  <div class="section-card">
+    <h2>Dicci cosa ne pensi</h2>
+    <p class="section-intro">Il tuo parere ci aiuta a fare ancora meglio la prossima volta.</p>
+    <iframe title="Modulo di feedback" src="https://docs.google.com/forms/d/e/1FAIpQLSfJ3QSPu2cgR_TgtuslwHx0Gf0fb3fOGtEIAJfIhHJibxkzhw/viewform?embedded=true" allowfullscreen></iframe>
+    <button class="btn btn-secondary" onclick="closeSection('feedbackSection')">Chiudi</button>
+  </div>
+</div>
+
+<div id="menuSection" class="section">
+  <div class="section-card">
+    <h2>Menu del pranzo</h2>
+
+    <div class="menu-course">
+      <div class="course-title">Antipasti</div>
+      <div class="course-description">Salumi, Focaccia, Asiago e Olive</div>
+    </div>
+    <div class="menu-course">
+      <div class="course-title">Primi</div>
+      <div class="course-description">Risotto all’Amarone con Monte Veronese</div>
+      <div class="course-description">Pappardelle al Cinghiale</div>
+    </div>
+    <div class="menu-course">
+      <div class="course-title">Secondi</div>
+      <div class="course-description">Straccetti di Manzo con Monte V.se</div>
+      <div class="course-sub">con Patate rosolate e Verdure gratinate</div>
+    </div>
+    <div class="menu-course"><div class="course-title">Dolce - Caffè</div></div>
+
+    <div class="menu-wine">
+      <div class="wine-title">Vino Cantina VENCIU</div>
+      <div class="wine-list">Bianco Custoza • Bardolino • Prosecco</div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="closeSection('menuSection')">Chiudi</button>
+  </div>
+</div>
+
+<div id="lotterySection" class="section">
+  <div class="section-card">
+    <h2>Lotteria</h2>
+    <p class="section-intro">Segui l'estrazione: i numeri si aggiornano da soli.</p>
+    <div class="lottery-live">
+      <div class="lottery-current" id="lotteryCurrentNumber">
+        <div class="lottery-inactive">Caricamento...</div>
+      </div>
+      <div class="lottery-previous" id="lotteryPreviousSection" style="display: none;">
+        <div class="lottery-previous-title" id="lotteryPreviousTitle">Tutti i numeri chiamati</div>
+        <div class="lottery-previous-numbers" id="lotteryPreviousNumbers"></div>
+      </div>
+    </div>
+    <button class="btn btn-secondary" onclick="closeSection('lotterySection')">Chiudi</button>
+  </div>
+</div>
+
+<div id="partnersSection" class="section">
+  <div class="section-card">
+    <h2>I nostri partner</h2>
+    <p class="section-intro">Grazie a chi ha scelto di esserci e di sostenere questa giornata.</p>
+    <div class="partners-grid" id="partnersGrid"></div>
+    <p class="partners-status" id="partnersStatus">Caricamento...</p>
+    <button class="btn btn-secondary" onclick="closeSection('partnersSection')">Chiudi</button>
+  </div>
+</div>
+
+<script>
+  // Navigazione: indipendente da Firebase, così funziona sempre.
+  // Usa la cronologia del browser: il tasto "indietro" del telefono torna al menu.
+  var currentSection = null;
+
+  function openUI(id) {
+    document.querySelectorAll('.section').forEach(function (s) { s.style.display = 'none'; });
+    document.getElementById('menu').style.display = 'none';
+    document.getElementById('backButton').style.display = 'flex';
+    document.getElementById(id).style.display = 'block';
+    currentSection = id;
+    window.scrollTo(0, 0);
+    if (id === 'lotterySection') { try { startLotteryListener(); } catch (e) { console.error(e); } }
+  }
+
+  function showMenuUI() {
+    document.querySelectorAll('.section').forEach(function (s) { s.style.display = 'none'; });
+    document.getElementById('menu').style.display = 'block';
+    document.getElementById('backButton').style.display = 'none';
+    currentSection = null;
+    window.scrollTo(0, 0);
+    try { stopLotteryListener(); } catch (e) {}
+    try { resetUploadForm(); } catch (e) {}
+  }
+
+  function showSection(id) {
+    openUI(id);
+    try { history.pushState({ section: id }, ''); } catch (e) {}
+  }
+
+  function closeSection() {
+    if (history.state && history.state.section) history.back(); // popstate riporta al menu
+    else showMenuUI();
+  }
+
+  function backToMenu() { closeSection(); }
+
+  window.addEventListener('popstate', function (e) {
+    if (e.state && e.state.section) openUI(e.state.section);
+    else showMenuUI();
+  });
+</script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+    authDomain: "lotteria-bd6c9.firebaseapp.com",
+    databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lotteria-bd6c9",
+    storageBucket: "lotteria-bd6c9.firebasestorage.app",
+    messagingSenderId: "606098477771",
+    appId: "1:606098477771:web:2c445353d3876c12c8014e",
+    measurementId: "G-VNYMKWRNTN"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  firebase.firestore().settings({ experimentalAutoDetectLongPolling: true });
+
+  const firestore = firebase.firestore();
+  const database = firebase.database();
+
+  firebase.auth().signInAnonymously()
+    .then(() => {
+      console.log("Utente autenticato anonimamente.");
+      loadBackgroundImage();
+      loadPartnerLogos();
+    })
+    .catch((error) => {
+      console.error("Errore autenticazione anonima:", error);
+      document.getElementById('partnersStatus').textContent = 'Non riesco a caricare i partner in questo momento.';
+    });
+
+  async function loadBackgroundImage() {
+    try {
+      const url = 'altro/bg.png';
+      await new Promise((ok, ko) => { const im = new Image(); im.onload = ok; im.onerror = ko; im.src = url; });
+      document.body.style.backgroundImage = `url('${url}')`;
+      document.body.style.backgroundSize = 'cover';
+      document.body.style.backgroundPosition = 'center center';
+      document.body.style.backgroundAttachment = 'fixed';
+    } catch (error) {
+      console.log('Sfondo bg.png non trovato, uso il colore di default.');
     }
-  </script>
+  }
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
+  async function loadPartnerLogos() {
+    const grid = document.getElementById('partnersGrid');
+    const status = document.getElementById('partnersStatus');
+    try {
+      // elenco dei file in loghi/loghi.json (cartella ospitata con le pagine)
+      const resp = await fetch('loghi/loghi.json', { cache: 'no-cache' });
+      const raw = resp.ok ? await resp.json() : [];
+      // voci: o un nome file, oppure { name, file, url } (url = sito, altrimenti Maps, altrimenti vuoto)
+      const logos = raw.map(x => typeof x === 'string' ? { name: x, file: x, link: null } : { name: x.name || x.file, file: x.file, link: x.url || null })
+        .filter(x => x.file)
+        .map(x => ({ name: x.name, url: 'loghi/' + encodeURIComponent(x.file), link: x.link }));
+      if (!logos.length) {
+        status.textContent = 'I loghi dei partner arriveranno presto.';
+        return;
+      }
 
-  <script>
-    // ✅ CONFIGURA FIREBASE
-    const firebaseConfig = {
-      apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
-      authDomain: "lotteria-bd6c9.firebaseapp.com",
-      databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "lotteria-bd6c9",
-      storageBucket: "lotteria-bd6c9.appspot.com",
-      messagingSenderId: "606098477771",
-      appId: "1:606098477771:web:2c445353d3876c12c8014e",
-      measurementId: "G-VNYMKWRNTN"
+      for (let i = logos.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [logos[i], logos[j]] = [logos[j], logos[i]];
+      }
+
+      logos.forEach(logo => {
+        const card = document.createElement(logo.link ? 'a' : 'div');
+        card.className = 'partner-card' + (logo.link ? ' has-link' : '');
+        if (logo.link) { card.href = logo.link; card.target = '_blank'; card.rel = 'noopener noreferrer'; card.setAttribute('aria-label', logo.name + ' (si apre in una nuova scheda)'); }
+        const img = document.createElement('img');
+        img.src = logo.url;
+        img.alt = logo.name;
+        img.loading = 'lazy';
+        card.appendChild(img);
+        grid.appendChild(card);
+      });
+      status.style.display = 'none';
+    } catch (error) {
+      console.error('Errore caricamento loghi partner:', error);
+      status.textContent = 'Non riesco a caricare i partner in questo momento.';
+    }
+  }
+
+
+  // ---- Modello lotteria condiviso: status + elenco completo dei numeri ----
+  // status: 'not_started' | 'live' | 'ended'; drawn: tutti i numeri in ordine di chiamata.
+  // current/previous restano scritti per compatibilità con lo schermo numeri.
+  function normLottery(d){
+    d = d || {};
+    let drawn = null;
+    if (Array.isArray(d.drawn)) drawn = d.drawn.slice();
+    else if (d.drawn && typeof d.drawn === 'object') drawn = Object.values(d.drawn);
+    if (!drawn) {
+      const prev = Array.isArray(d.previous) ? d.previous.slice().reverse() : [];
+      drawn = prev;
+      if (d.current && d.current !== '*' && d.current !== '****') drawn.push(d.current);
+    }
+    drawn = drawn.map(String);
+    let status = d.status;
+    if (['not_started','live','ended'].indexOf(status) < 0) status = drawn.length ? 'live' : 'not_started';
+    return { status: status, drawn: drawn };
+  }
+  function buildLottery(status, drawn){
+    return {
+      status: status,
+      drawn: drawn,
+      current: drawn.length ? drawn[drawn.length - 1] : '*',
+      previous: drawn.slice(0, -1).reverse().slice(0, 10)
     };
+  }
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const storage = firebase.storage();
+  let lotteryListener = null;
 
-    // 📸 Upload Foto
-    document.getElementById('photoForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
+  function renderLottery(raw) {
+    const st = normLottery(raw);
+    const currentDiv = document.getElementById('lotteryCurrentNumber');
+    const listSection = document.getElementById('lotteryPreviousSection');
+    const listDiv = document.getElementById('lotteryPreviousNumbers');
+    const title = document.getElementById('lotteryPreviousTitle');
+    currentDiv.textContent = '';
+    listDiv.textContent = '';
 
-      const name = document.getElementById('photoName').value;
-      const dedica = document.getElementById('photoDedica').value;
-      const file = document.getElementById('photoFile').files[0];
+    function msg(cls, text, small) {
+      const d = document.createElement('div');
+      d.className = cls;
+      d.textContent = text;
+      if (small) { const s = document.createElement('small'); s.textContent = small; d.appendChild(s); }
+      currentDiv.appendChild(d);
+    }
 
-      if (!name || !dedica || !file) return alert("Compila tutti i campi!");
+    if (st.status === 'not_started') {
+      msg('lottery-inactive', 'La lotteria non è ancora iniziata');
+      listSection.style.display = 'none';
+      return;
+    }
 
-      const timestamp = Date.now();
-      const fileRef = storage.ref().child(`foto/${timestamp}_${file.name}`);
-      await fileRef.put(file);
-      const url = await fileRef.getDownloadURL();
+    if (st.status === 'ended') {
+      msg('lottery-ended', 'La lotteria è terminata', 'Grazie a tutti per aver partecipato!');
+    } else if (st.drawn.length === 0) {
+      msg('lottery-inactive', 'In attesa del primo numero…');
+    } else {
+      const last = st.drawn[st.drawn.length - 1];
+      for (let i = 0; i < last.length; i++) {
+        const s = document.createElement('span');
+        s.textContent = last[i];
+        currentDiv.appendChild(s);
+      }
+    }
 
-      await db.ref('immagini/' + timestamp).set({
-        nome: name,
-        dedica: dedica,
-        url: url,
-        status: "pending"
+    if (st.drawn.length > 0) {
+      title.textContent = 'Tutti i numeri chiamati (' + st.drawn.length + ')';
+      st.drawn.slice().reverse().forEach(function (n, i) {
+        const c = document.createElement('span');
+        c.className = 'draw-chip' + (i === 0 ? ' is-last' : '');
+        c.textContent = n;
+        listDiv.appendChild(c);
+      });
+      listSection.style.display = 'block';
+    } else {
+      listSection.style.display = 'none';
+    }
+  }
+
+  function startLotteryListener() {
+    if (lotteryListener) return;
+    lotteryListener = database.ref('lottery').on('value', snapshot => renderLottery(snapshot.val()));
+  }
+
+  function stopLotteryListener() {
+    if (lotteryListener) {
+      database.ref('lottery').off('value', lotteryListener);
+      lotteryListener = null;
+    }
+  }
+
+  function updateFileName() {
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput.files.length === 0) { resetFileButton(); return; }
+
+    const file = fileInput.files[0];
+    if (file.size > 40 * 1024 * 1024) {
+      alert("La foto supera il limite di 40 MB. Scegli un'immagine più piccola.");
+      fileInput.value = '';
+      resetFileButton();
+      return;
+    }
+
+    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    document.getElementById('fileLabelText').textContent = 'Foto scelta: tocca per cambiarla';
+    document.getElementById('fileName').textContent = file.name + ' (' + sizeMB + ' MB)';
+    document.getElementById('fileLabel').classList.add('has-file');
+    const preview = document.getElementById('filePreview');
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'block';
+  }
+
+  function resetFileButton() {
+    document.getElementById('fileLabelText').textContent = 'Aggiungi una foto';
+    document.getElementById('fileName').textContent = '';
+    document.getElementById('fileLabel').classList.remove('has-file');
+    const preview = document.getElementById('filePreview');
+    preview.style.display = 'none';
+    preview.removeAttribute('src');
+  }
+
+  function resetUploadForm() {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('nameInput').value = '';
+    document.getElementById('dedicaInput').value = '';
+    resetFileButton();
+    document.getElementById('uploadForm').style.display = 'block';
+    document.getElementById('uploadSuccess').hidden = true;
+    window.scrollTo(0, 0);
+  }
+
+  function resizeImage(file, maxSide = 1000) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.round(img.naturalWidth * s), h = Math.round(img.naturalHeight * s);
+        const c = document.createElement('canvas'); c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        let q = 0.8, out = c.toDataURL('image/jpeg', q);
+        while (out.length > 700000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+        resolve(out);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Non riesco a leggere questa foto. Prova con un\'altra.')); };
+      img.src = url;
+    });
+  }
+
+  async function upload() {
+    const file = document.getElementById('fileInput').files[0];
+    const name = document.getElementById('nameInput').value.trim();
+    const dedica = document.getElementById('dedicaInput').value.trim();
+
+    if (!name || !dedica) {
+      alert("Compila nome e dedica!");
+      return;
+    }
+
+    if (file && file.size > 40 * 1024 * 1024) {
+      alert("La foto supera il limite di 40 MB!");
+      return;
+    }
+
+    const uploadBtn = document.getElementById('uploadBtn');
+    const loader = document.getElementById('loader');
+    const loadingText = document.getElementById('loadingText');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+
+    uploadBtn.disabled = true;
+    loader.style.display = 'block';
+    loadingText.style.display = 'block';
+
+    try {
+      let imageUrl = null;
+
+      if (file) {
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '40%'; progressBar.textContent = '…';
+        imageUrl = await resizeImage(file);   // foto ridimensionata e salvata nel database (niente Storage)
+        progressBar.style.width = '100%'; progressBar.textContent = '100%';
+      }
+
+      await firestore.collection('foto').add({
+        name,
+        dedica,
+        imageUrl: imageUrl,
+        status: 'pending',
+        shown: false,
+        timestamp: Date.now()
       });
 
-      document.getElementById('photoForm').reset();
-      document.getElementById('photoSuccess').textContent = "Foto inviata! Attendi approvazione.";
-    });
+      document.getElementById('uploadForm').style.display = 'none';
+      document.getElementById('uploadSuccess').hidden = false;
+      window.scrollTo(0, 0);
 
-    // 💬 Invio dedica
-    document.getElementById('dedicaForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById('dedicaName').value;
-      const text = document.getElementById('dedicaText').value;
-
-      if (!name || !text) return alert("Inserisci nome e dedica.");
-
-      const timestamp = Date.now();
-
-      await db.ref('dediche/' + timestamp).set({
-        nome: name,
-        dedica: text,
-        status: "pending"
-      });
-
-      document.getElementById('dedicaForm').reset();
-      document.getElementById('dedicaSuccess').textContent = "Dedica inviata! Attendi approvazione.";
-    });
-  </script>
+    } catch (e) {
+      alert("Errore durante il caricamento: " + e.message);
+    } finally {
+      uploadBtn.disabled = false;
+      loader.style.display = 'none';
+      loadingText.style.display = 'none';
+      progressContainer.style.display = 'none';
+      progressBar.style.width = '0%';
+      progressBar.textContent = '0%';
+    }
+  }
+</script>
 
 </body>
 </html>

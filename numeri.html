@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizzazione Numeri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px 180px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        #logo-header {
+            max-width: 400px;
+            width: 80%;
+            height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.3));
+        }
+
+        #lottery-container {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            text-align: center;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        #current-number {
+            font-size: 120px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            font-family: 'Helvetica Neue', sans-serif;
+            flex-wrap: wrap;
+        }
+
+        #current-number span {
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #current-number span:hover {
+            transform: translateY(-5px);
+        }
+
+        #current-number span:nth-child(even) {
+            background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+            color: #333;
+        }
+
+        #current-number span:nth-child(odd) {
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            color: #333;
+        }
+
+        #status-pill {
+            display: inline-block;
+            margin-bottom: 24px;
+            padding: 8px 22px;
+            border-radius: 999px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        #status-pill.not_started { background: #fff3cd; color: #7a5d00; }
+        #status-pill.live { background: #d1e7dd; color: #0f5132; }
+        #status-pill.ended { background: #e5e7eb; color: #374151; }
+
+        .previous-numbers-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #previous-numbers {
+            font-size: 32px;
+            color: #666;
+            font-weight: 500;
+            letter-spacing: 2px;
+        }
+
+        footer {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            padding: 20px 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+
+        #sponsor-carousel {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+            position: relative;
+            height: 120px;
+        }
+
+        #sponsor-carousel .carousel-content {
+            display: flex;
+            animation: scroll 180s linear infinite;
+            gap: 60px;
+            align-items: center;
+        }
+
+        #sponsor-carousel img {
+            height: 100px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+            filter: grayscale(20%);
+            transition: all 0.3s ease;
+        }
+
+        #sponsor-carousel img:hover {
+            filter: grayscale(0%);
+            transform: scale(1.1);
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            #lottery-container {
+                padding: 30px 20px;
+            }
+
+            #current-number {
+                font-size: 60px;
+                gap: 8px;
+            }
+
+            #current-number span {
+                padding: 15px 20px;
+                min-width: 60px;
+            }
+
+            #previous-numbers {
+                font-size: 18px;
+            }
+
+            #sponsor-carousel {
+                height: 80px;
+            }
+
+            #sponsor-carousel img {
+                height: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Visualizzazione Numeri</h1>
+    
+    <div id="lottery-container">
+        <div id="status-pill" class="not_started"></div>
+        <div id="current-number">
+            <span>*</span>
+            <span>*</span>
+            <span>*</span>
+            <span>*</span>
+        </div>
+        <div class="previous-numbers-title">Numeri Precedenti</div>
+        <div id="previous-numbers">* | * | * | * | * | * | * | * | * | *</div>
+    </div>
+
+    <footer>
+        <div id="sponsor-carousel">
+            <div class="carousel-content" id="carouselContent"></div>
+        </div>
+    </footer>
+
+    <script>
+        // Carosello sponsor: legge loghi/loghi.json (voci con "file"); la serie è duplicata per un ciclo continuo
+        fetch('loghi/loghi.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : []).then(list => {
+            const files = list.map(x => typeof x === 'string' ? { name: '', file: x } : x).filter(x => x.file);
+            for (let i = files.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [files[i], files[j]] = [files[j], files[i]]; }
+            const box = document.getElementById('carouselContent');
+            [0, 1].forEach(() => files.forEach(x => {
+                const im = document.createElement('img');
+                im.src = 'loghi/' + encodeURIComponent(x.file); im.alt = x.name || 'Sponsor';
+                im.onerror = () => { im.style.display = 'none'; };
+                box.appendChild(im);
+            }));
+        }).catch(() => {});
+    </script>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        // Configurazione Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+            authDomain: "lotteria-bd6c9.firebaseapp.com",
+            databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "lotteria-bd6c9",
+            storageBucket: "lotteria-bd6c9.firebasestorage.app",
+            messagingSenderId: "606098477771",
+            appId: "1:606098477771:web:2c445353d3876c12c8014e",
+            measurementId: "G-VNYMKWRNTN"
+        };
+
+        // Inizializza Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Riferimenti agli elementi DOM
+        const currentDiv = document.getElementById('current-number');
+        const previousDiv = document.getElementById('previous-numbers');
+
+        // Variabile per tracciare il numero precedente
+        let lastNumber = null;
+
+        // Funzione per lanciare i coriandoli
+        function launchConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        // Funzione per aggiornare la visualizzazione
+        function render(current, previousArray) {
+            // Aggiorna il numero corrente
+            currentDiv.innerHTML = "";
+            const currentStr = current.toString();
+            for (let i = 0; i < currentStr.length; i++) {
+                currentDiv.innerHTML += '<span>' + currentStr[i] + '</span>';
+            }
+            
+            // Aggiorna i numeri precedenti
+            previousDiv.innerHTML = previousArray.join(" | ");
+        }
+
+        // Modello condiviso (status + numeri)
+
+        // ---- Modello lotteria condiviso: status + elenco completo dei numeri ----
+        // status: 'not_started' | 'live' | 'ended'; drawn: tutti i numeri in ordine di chiamata.
+        // current/previous restano scritti per compatibilità con lo schermo numeri.
+        function normLottery(d){
+          d = d || {};
+          let drawn = null;
+          if (Array.isArray(d.drawn)) drawn = d.drawn.slice();
+          else if (d.drawn && typeof d.drawn === 'object') drawn = Object.values(d.drawn);
+          if (!drawn) {
+            const prev = Array.isArray(d.previous) ? d.previous.slice().reverse() : [];
+            drawn = prev;
+            if (d.current && d.current !== '*' && d.current !== '****') drawn.push(d.current);
+          }
+          drawn = drawn.map(String);
+          let status = d.status;
+          if (['not_started','live','ended'].indexOf(status) < 0) status = drawn.length ? 'live' : 'not_started';
+          return { status: status, drawn: drawn };
+        }
+        function buildLottery(status, drawn){
+          return {
+            status: status,
+            drawn: drawn,
+            current: drawn.length ? drawn[drawn.length - 1] : '*',
+            previous: drawn.slice(0, -1).reverse().slice(0, 10)
+          };
+        }
+
+        const PILL_TEXT = {
+            not_started: 'La lotteria non è ancora iniziata',
+            live: 'Lotteria in corso',
+            ended: 'Lotteria terminata'
+        };
+
+        // Ascolta i cambiamenti da Firebase in tempo reale
+        db.ref('lottery').on('value', snapshot => {
+            const raw = snapshot.val();
+            const st = normLottery(raw);
+            const data = raw || { current: '*', previous: [] };
+            let currentNumber = data.current || '*';
+            let prev = data.previous || [];
+
+            // Se la lotteria non è iniziata non mostriamo numeri
+            if (st.status === 'not_started') { currentNumber = '*'; prev = []; }
+
+            const pill = document.getElementById('status-pill');
+            pill.className = st.status;
+            pill.textContent = PILL_TEXT[st.status];
+
+            // Coriandoli solo a lotteria in corso, quando il numero cambia (non al primo caricamento)
+            if (st.status === 'live' && lastNumber !== null && currentNumber !== lastNumber && currentNumber !== '*') {
+                launchConfetti();
+            }
+
+            lastNumber = currentNumber;
+            render(currentNumber, prev);
+        });
+    </script>
+
+</body>
+</html>

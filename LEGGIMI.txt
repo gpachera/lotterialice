@@ -1,0 +1,27 @@
+LOTTERIA - IL SORRISO DI ALICE (cartella per Railway)
+
+index.html              pagina per gli ospiti (menu, foto e dedica, lotteria, partner)
+proiezione.html         schermo con foto/dediche, QR e loghi sponsor
+numeri.html             schermo con i numeri estratti (coriandoli + carosello sponsor)
+inserimento-k7x2.html   pagina operatore: inserisce/elimina i numeri estratti
+cms-m4q9.html           pagina operatore: moderazione foto e gestione lotteria (password nel file)
+
+NIENTE FIREBASE STORAGE (richiede un piano a pagamento).
+- Le foto degli ospiti vengono ridimensionate sul telefono e salvate in Firestore (gratuito).
+- Loghi sponsor: cartella loghi/ + elenco loghi/loghi.json. Ogni sponsor ha: name, file (nome del file logo, vuoto finche'
+  non e' stato caricato), url (sito; se manca la scheda Google Maps; se manca nulla = logo non cliccabile).
+  Per aggiungere un logo: copia il file in loghi/ e scrivi il suo nome nel campo "file" dello sponsor.
+- Loghi: tutti i 44 sponsor sono inclusi.
+- altro/logo-header.png (incluso) e altro/bg.png (sfondo, facoltativo).
+
+Il database resta su Firebase (progetto lotteria-bd6c9): Realtime Database + Firestore + accesso anonimo.
+Le pagine operatore hanno nomi poco ovvi: non condividerne i link.
+
+REGIA DAL TELEFONO (cms-m4q9.html)
+Tre schede: Foto (approva/rifiuta/elimina), Lotteria (stato, numeri, correzioni), Schermo (cosa mostra la proiezione).
+La password si cambia nella riga "const PASSWORD" all'inizio dello script del file.
+Per comandare la proiezione servono due nodi nel Realtime Database: "screen" e "screenStatus".
+Se nella regia compare "il database non permette questa operazione", in Firebase > Realtime Database > Regole
+aggiungi questi due nodi accanto a "lottery" (senza cancellare le regole che gia' ci sono):
+    "screen":       { ".read": true, ".write": "auth != null" },
+    "screenStatus": { ".read": true, ".write": "auth != null" }

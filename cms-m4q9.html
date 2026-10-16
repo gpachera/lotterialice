@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0F4A61">
+<title>Regia · Il sorriso di Alice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:#FFF7EE; --card:#fff; --ink:#2B2420; --muted:#7A6E66; --line:#EADFD3;
+    --petrol:#1C6E8C; --petrol-d:#0F4A61; --coral:#E8704F; --green:#2F8F5B; --red:#C2453B;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: var(--paper); color: var(--ink); font-size: 16px; line-height: 1.4; padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 14px; min-height: 48px; padding: 0 18px; font-weight: 800; color: #fff; background: var(--petrol); }
+  button:active { transform: scale(.97); }
+  button:disabled { opacity: .5; }
+  button.ghost { background: #fff; color: var(--petrol); border: 2px solid var(--line); }
+  button.green { background: var(--green); } button.red { background: var(--red); } button.coral { background: var(--coral); }
+  input, textarea { font: inherit; width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 14px; border: 2px solid var(--line); background: #fff; color: var(--ink); }
+  input:focus, textarea:focus { outline: 3px solid rgba(28,110,140,.35); border-color: var(--petrol); }
+  .hidden { display: none !important; }
+
+  #login { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 24px; max-width: 420px; margin: 0 auto; }
+  #login h1 { margin: 0; font-size: 1.7rem; }
+  #login p { margin: 0; color: var(--muted); }
+
+  header.top { position: sticky; top: 0; z-index: 20; background: var(--petrol-d); color: #fff; padding: calc(10px + env(safe-area-inset-top)) 16px 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  header.top h1 { margin: 0; font-size: 1.1rem; }
+  header.top small { opacity: .8; display: block; font-weight: 600; font-size: .75rem; }
+  .conn { font-size: .75rem; font-weight: 800; padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,.18); white-space: nowrap; }
+  .conn.ok { background: #2F8F5B; } .conn.bad { background: var(--red); }
+  main { max-width: 720px; margin: 0 auto; padding: 14px 14px 20px; }
+  .tab { display: none; } .tab.on { display: block; }
+
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(3, 1fr); background: #fff; border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+  nav.tabs button { background: none; color: var(--muted); border-radius: 0; min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: .8rem; position: relative; }
+  nav.tabs button svg { width: 26px; height: 26px; }
+  nav.tabs button.on { color: var(--petrol); }
+  nav.tabs button.on::before { content: ''; position: absolute; top: 0; left: 28%; right: 28%; height: 4px; border-radius: 0 0 4px 4px; background: var(--coral); }
+  .dot { position: absolute; top: 8px; left: calc(50% + 10px); min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; background: var(--coral); color: #fff; font-size: .72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+  .box { background: var(--card); border-radius: 18px; padding: 14px; box-shadow: 0 2px 10px rgba(60,40,20,.06); margin-bottom: 14px; }
+  .box h2 { margin: 0 0 10px; font-size: 1.05rem; }
+  .muted { color: var(--muted); font-size: .9rem; }
+  .row { display: flex; gap: 10px; align-items: center; }
+  .row > * { flex: 1; }
+  .row > .fit { flex: 0 0 auto; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .seg button { background: #fff; color: var(--ink); border: 2px solid var(--line); padding: 0 6px; font-size: .92rem; }
+  .seg button.on { background: var(--petrol); border-color: var(--petrol); color: #fff; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .switch:first-of-type { border-top: 0; }
+  .switch b { display: block; } .switch span { color: var(--muted); font-size: .85rem; }
+  .switch input { width: 54px; height: 32px; min-height: 0; appearance: none; -webkit-appearance: none; border-radius: 99px; background: #CFC4B8; border: 0; position: relative; flex: 0 0 auto; transition: background .2s; padding: 0; }
+  .switch input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .switch input:checked { background: var(--green); } .switch input:checked::after { transform: translateX(22px); }
+
+  .chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px; }
+  .chips button { flex: 0 0 auto; background: #fff; color: var(--ink); border: 2px solid var(--line); min-height: 42px; font-size: .9rem; }
+  .chips button.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .photo { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 10px rgba(60,40,20,.08); margin-bottom: 14px; }
+  .photo .img { width: 100%; max-height: 38vh; object-fit: cover; display: block; background: #eee; cursor: zoom-in; }
+  .photo .textonly { padding: 18px 16px 4px; font-size: 1.05rem; font-weight: 700; color: var(--muted); }
+  .photo .body { padding: 12px 14px 14px; }
+  .photo .who { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .photo .who b { font-size: 1.1rem; }
+  .photo .who small { color: var(--muted); }
+  .photo .ded { margin: 6px 0 12px; font-size: 1rem; word-break: break-word; }
+  .tag { display: inline-block; font-size: .78rem; font-weight: 800; padding: 3px 10px; border-radius: 99px; margin-bottom: 8px; }
+  .t-pending { background: #FFF0CC; color: #8A5F00; } .t-queue { background: #DCEFFF; color: #0F4A61; }
+  .t-shown { background: #E4F4EA; color: #1F6A41; } .t-rej { background: #F9DEDB; color: #8A2A22; }
+  .photo .acts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .photo .acts.one { grid-template-columns: 1fr; }
+  .photo .acts .del { grid-column: 1 / -1; min-height: 40px; background: none; color: var(--red); font-size: .85rem; }
+  .empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+
+  .bigno { text-align: center; padding: 6px 0 12px; }
+  .bigno small { display: block; color: var(--muted); font-weight: 700; }
+  .bigno b { font-size: 4.2rem; line-height: 1; color: var(--petrol-d); letter-spacing: 1px; }
+  .callrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+  .callrow input { font-size: 1.8rem; font-weight: 800; text-align: center; min-height: 62px; }
+  .callrow button { min-height: 62px; font-size: 1.1rem; padding: 0 22px; }
+  .lot-item { display: grid; grid-template-columns: 44px 1fr 48px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .lot-item .n { color: var(--muted); font-weight: 800; text-align: right; }
+  .lot-item input { font-weight: 800; font-size: 1.15rem; }
+  .lot-item.last input { border-color: var(--coral); }
+  .lot-item button { padding: 0; background: #fff; color: var(--red); border: 2px solid var(--line); }
+  details.danger summary { color: var(--red); font-weight: 800; padding: 8px 0; cursor: pointer; }
+
+  .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode { background: #fff; color: var(--ink); border: 2px solid var(--line); text-align: left; padding: 12px; min-height: 84px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+  .mode span { font-weight: 600; font-size: .8rem; color: var(--muted); }
+  .mode.on { background: var(--petrol); border-color: var(--petrol); color: #fff; } .mode.on span { color: rgba(255,255,255,.85); }
+  .quick { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+  .quick button { background: #fff; color: var(--petrol); border: 2px solid var(--line); min-height: 40px; font-size: .85rem; }
+  textarea { min-height: 96px; resize: vertical; }
+
+  #lightbox { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; padding: 10px; }
+  #lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
+  #toast { position: fixed; left: 12px; right: 12px; bottom: calc(86px + env(safe-area-inset-bottom)); z-index: 70; background: var(--ink); color: #fff; padding: 12px 16px; border-radius: 14px; font-weight: 700; text-align: center; opacity: 0; pointer-events: none; transition: opacity .25s; max-width: 520px; margin: 0 auto; }
+  #toast.on { opacity: 1; } #toast.err { background: var(--red); }
+</style>
+</head>
+<body>
+
+<section id="login">
+  <img src="altro/logo-header.png" alt="Il sorriso di Alice" style="width:100%;height:auto">
+  <h1>Regia</h1>
+  <p>Area riservata a chi organizza la giornata.</p>
+  <input id="pwd" type="password" placeholder="Password" autocomplete="current-password" enterkeyhint="go">
+  <button id="loginBtn">Entra</button>
+</section>
+
+<div id="app" class="hidden">
+  <header class="top">
+    <div><h1>Regia</h1><small id="clock"></small></div>
+    <span class="conn" id="conn">Connessione…</span>
+  </header>
+
+  <main>
+    <section class="tab on" id="tab-foto">
+      <div class="chips" id="chips">
+        <button data-f="pending" class="on">Da approvare <span id="cPending">0</span></button>
+        <button data-f="approved">Approvate <span id="cApproved">0</span></button>
+        <button data-f="rejected">Rifiutate <span id="cRejected">0</span></button>
+        <button data-f="all">Tutte</button>
+      </div>
+      <div id="photos"></div>
+      <button class="ghost hidden" id="moreBtn" style="width:100%">Carica altre foto</button>
+    </section>
+
+    <section class="tab" id="tab-lotteria">
+      <div class="box">
+        <h2>Stato della lotteria</h2>
+        <div class="seg">
+          <button id="stNot">Non iniziata</button>
+          <button id="stLive">In corso</button>
+          <button id="stEnd">Terminata</button>
+        </div>
+      </div>
+      <div class="box">
+        <div class="bigno"><small>Ultimo numero chiamato</small><b id="lotLast">—</b></div>
+        <div class="callrow">
+          <input id="lotNew" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="Numero" enterkeyhint="done" autocomplete="off">
+          <button id="lotAdd" class="coral">Chiama</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="ghost" id="lotUndo">↩ Annulla ultimo</button>
+          <span class="muted fit" id="lotCount"></span>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Tutti i numeri chiamati</h2>
+        <p class="muted" style="margin-top:-6px">Tocca un numero per correggerlo. Il più recente è in alto.</p>
+        <div id="lotList"></div>
+        <details class="danger"><summary>Azzera lotteria</summary>
+          <p class="muted">Cancella tutti i numeri e riporta lo stato su «Non iniziata». Serve per ripartire da zero.</p>
+          <button class="red" id="lotReset">Azzera tutto</button>
+        </details>
+      </div>
+    </section>
+
+    <section class="tab" id="tab-schermo">
+      <div class="box">
+        <h2>Cosa mostra la proiezione</h2>
+        <div class="modes" id="modes">
+          <button class="mode" data-m="auto">Saluti e partner<span>Il solito: saluti, QR e loghi</span></button>
+          <button class="mode" data-m="lottery">Lotteria<span>Numero grande e tutti i chiamati</span></button>
+          <button class="mode" data-m="partners">Tutti i partner<span>Muro con tutti i loghi</span></button>
+          <button class="mode" data-m="qr">Invito con QR<span>QR grande per partecipare</span></button>
+          <button class="mode" data-m="logo">Logo<span>Sfondo acquerello con il logo</span></button>
+          <button class="mode" data-m="message">Messaggio<span>Scrivi una frase a tutto schermo</span></button>
+        </div>
+        <div id="msgBox" class="hidden">
+          <div class="quick" id="quick"></div>
+          <textarea id="msgText" maxlength="160" placeholder="Scrivi il messaggio…"></textarea>
+          <button id="msgSend" style="width:100%;margin-top:8px">Mostra il messaggio</button>
+        </div>
+      </div>
+      <div class="box">
+        <h2>Saluti</h2>
+        <label class="switch"><div><b>Pausa saluti</b><span>Ferma i saluti sullo schermo (restano in coda)</span></div><input type="checkbox" id="swPause"></label>
+        <label class="switch"><div><b>Approva automaticamente</b><span>Le nuove foto vanno subito in coda, senza controllo</span></div><input type="checkbox" id="swAuto"></label>
+        <div style="margin-top:8px"><button class="ghost" id="skipBtn" style="width:100%">Salta il saluto in corso</button></div>
+      </div>
+      <div class="box">
+        <h2>Collegamento</h2>
+        <div id="projState" class="muted">Controllo…</div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabs">
+    <button data-t="foto" class="on">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.2-2h5.6L16 5"/></svg>
+      Foto<span class="dot hidden" id="dotFoto">0</span>
+    </button>
+    <button data-t="lotteria">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9a2 2 0 0 0 0 6v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 0 0-6V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z"/><path d="M14 5v3M14 11v2M14 16v3"/></svg>
+      Lotteria
+    </button>
+    <button data-t="schermo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="12.5" rx="2.5"/><path d="M8 20.5h8M12 16.5v4"/></svg>
+      Schermo
+    </button>
+  </nav>
+</div>
+
+<div id="lightbox" class="hidden"><img alt="Foto"></div>
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+(function () {
+  'use strict';
+  // ====== Impostazioni ======
+  const PASSWORD = '1234';          // <-- cambia qui la password della regia
+  const firebaseConfig = {
+    apiKey: "AIzaSyDy0jxa0lck01b9aPHO9ra-CFGHZjDl3ow",
+    authDomain: "lotteria-bd6c9.firebaseapp.com",
+    databaseURL: "https://lotteria-bd6c9-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lotteria-bd6c9",
+    storageBucket: "lotteria-bd6c9.firebasestorage.app",
+    messagingSenderId: "606098477771",
+    appId: "1:606098477771:web:2c445353d3876c12c8014e"
+  };
+  const MESSAGES = ['Si inizia tra pochi minuti', 'Buon appetito!', 'Tra poco l’estrazione della lotteria', 'Grazie a tutti per essere qui', 'Fai un saluto: inquadra il QR dal telefono'];
+
+  const $ = id => document.getElementById(id);
+  const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  let toastT;
+  function toast(msg, err) { const t = $('toast'); t.textContent = msg; t.className = 'on' + (err ? ' err' : ''); clearTimeout(toastT); toastT = setTimeout(() => t.className = '', err ? 5000 : 2200); }
+  function fail(e) {
+    console.error(e);
+    const m = (e && (e.code || e.message)) || String(e);
+    if (/permission/i.test(m)) toast('Il database non permette questa operazione (regole Firebase). Vedi LEGGIMI.', true);
+    else toast('Errore: ' + m, true);
+  }
+  function store(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+  function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+  // ====== Accesso ======
+  function enter() { $('login').classList.add('hidden'); $('app').classList.remove('hidden'); start(); }
+  $('loginBtn').onclick = () => { if ($('pwd').value === PASSWORD) { store('regia', '1'); enter(); } else toast('Password errata', true); };
+  $('pwd').addEventListener('keydown', e => { if (e.key === 'Enter') $('loginBtn').click(); });
+
+  // ====== Schede ======
+  document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
+    document.querySelectorAll('nav.tabs button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + b.dataset.t));
+    window.scrollTo(0, 0);
+  });
+
+  // ====== Firebase ======
+  let fs, rtdb, started = false;
+  function start() {
+    if (started) return; started = true;
+    firebase.initializeApp(firebaseConfig);
+    firebase.firestore().settings({ experimentalAutoDetectLongPolling: true });
+    fs = firebase.firestore(); rtdb = firebase.database();
+    firebase.auth().signInAnonymously().catch(e => console.error(e)).then(() => { startPhotos(); startLottery(); startScreen(); });
+    rtdb.ref('.info/connected').on('value', s => { const c = $('conn'); c.textContent = s.val() ? 'Online' : 'Offline'; c.className = 'conn ' + (s.val() ? 'ok' : 'bad'); });
+    const tick = () => { $('clock').textContent = new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }); };
+    tick(); setInterval(tick, 15000);
+  }
+
+  // ====== FOTO ======
+  let PHOTO_LIMIT = 40, photos = [], filter = 'pending', firstSnap = true, unsubPhotos = null;
+  function startPhotos() {
+    if (unsubPhotos) unsubPhotos();
+    unsubPhotos = fs.collection('foto').orderBy('timestamp', 'desc').limit(PHOTO_LIMIT).onSnapshot(snap => {
+      const fresh = [];
+      snap.docChanges().forEach(ch => { if (ch.type === 'added' && !firstSnap && (ch.doc.data().status || 'pending') === 'pending') fresh.push(ch.doc.data().name || 'Qualcuno'); });
+      photos = snap.docs.map(d => Object.assign({ id: d.id }, d.data()));
+      $('moreBtn').classList.toggle('hidden', snap.size < PHOTO_LIMIT);
+      firstSnap = false;
+      if (fresh.length) { toast('Nuovo saluto da ' + fresh[0] + (fresh.length > 1 ? ' e altri' : '')); try { navigator.vibrate && navigator.vibrate(180); } catch (e) {} }
+      autoApprovePending();
+      renderPhotos();
+    }, fail);
+  }
+  $('moreBtn').onclick = () => { PHOTO_LIMIT += 40; firstSnap = true; startPhotos(); };
+  document.querySelectorAll('#chips button').forEach(b => b.onclick = () => { filter = b.dataset.f; document.querySelectorAll('#chips button').forEach(x => x.classList.toggle('on', x === b)); renderPhotos(); });
+
+  const stOf = p => p.status || 'pending';
+  const isRej = p => stOf(p) === 'rejected' || stOf(p) === 'flagged';
+  function renderPhotos() {
+    const pend = photos.filter(p => stOf(p) === 'pending').length;
+    $('cPending').textContent = pend;
+    $('cApproved').textContent = photos.filter(p => stOf(p) === 'approved').length;
+    $('cRejected').textContent = photos.filter(isRej).length;
+    const dot = $('dotFoto'); dot.textContent = pend; dot.classList.toggle('hidden', !pend);
+    document.title = (pend ? '(' + pend + ') ' : '') + 'Regia · Il sorriso di Alice';
+
+    let list = photos.filter(p => filter === 'all' ? true : filter === 'rejected' ? isRej(p) : stOf(p) === filter);
+    if (filter === 'pending') list = list.slice().reverse();     // i più vecchi per primi: si smaltisce in ordine
+    const box = $('photos'); box.textContent = '';
+    if (!list.length) { box.innerHTML = '<div class="empty">' + (filter === 'pending' ? 'Nessun saluto da approvare.' : 'Nessuna foto qui.') + '</div>'; return; }
+    list.forEach(p => box.appendChild(card(p)));
+  }
+  function card(p) {
+    const st = stOf(p), el = document.createElement('div'); el.className = 'photo';
+    const time = p.timestamp ? new Date(p.timestamp).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
+    let tag;
+    if (st === 'pending') tag = '<span class="tag t-pending">Da approvare</span>';
+    else if (st === 'approved') tag = p.shown ? '<span class="tag t-shown">Già mostrata</span>' : '<span class="tag t-queue">In coda per lo schermo</span>';
+    else tag = '<span class="tag t-rej">Rifiutata</span>';
+    el.innerHTML =
+      (p.imageUrl ? '<img class="img" alt="Foto di ' + esc(p.name) + '">' : '<div class="textonly">Solo dedica, senza foto</div>') +
+      '<div class="body">' + tag +
+      '<div class="who"><b>' + esc(p.name || 'Anonimo') + '</b><small>' + time + '</small></div>' +
+      '<div class="ded">' + esc(p.dedica || '') + '</div><div class="acts"></div></div>';
+    if (p.imageUrl) { const im = el.querySelector('img'); im.src = p.imageUrl; im.onclick = () => { $('lightbox').querySelector('img').src = p.imageUrl; $('lightbox').classList.remove('hidden'); }; }
+    const acts = el.querySelector('.acts');
+    const add = (txt, cls, fn) => { const b = document.createElement('button'); b.textContent = txt; if (cls) b.className = cls; b.onclick = () => { b.disabled = true; fn().catch(e => { b.disabled = false; fail(e); }); }; acts.appendChild(b); return b; };
+    if (st === 'pending') { add('✔ Approva', 'green', () => approve(p)); add('✖ Rifiuta', 'ghost', () => setSt(p, 'rejected')); }
+    else if (st === 'approved') { add(p.shown ? '↻ Mostra di nuovo' : '⏸ Togli dalla coda', 'ghost', () => p.shown ? reshow(p) : setSt(p, 'pending')); add('✖ Rifiuta', 'ghost', () => setSt(p, 'rejected')); }
+    else { add('↩ Rimetti da approvare', 'ghost', () => setSt(p, 'pending')); acts.classList.add('one'); }
+    const del = add('Elimina definitivamente', 'del', async () => { if (!confirm('Eliminare questo saluto per sempre?')) { del.disabled = false; return; } await fs.collection('foto').doc(p.id).delete(); toast('Eliminato'); });
+    return el;
+  }
+  const approve = p => fs.collection('foto').doc(p.id).update({ status: 'approved', approvedAt: Date.now() }).then(() => toast('Approvato'));
+  const reshow = p => fs.collection('foto').doc(p.id).update({ status: 'approved', shown: false, approvedAt: Date.now() }).then(() => toast('Tornerà sullo schermo'));
+  const setSt = (p, s) => { const u = { status: s }; if (s !== 'approved') u.approvedAt = firebase.firestore.FieldValue.delete(); return fs.collection('foto').doc(p.id).update(u); };
+  $('lightbox').onclick = () => $('lightbox').classList.add('hidden');
+
+  // Approvazione automatica (la fa anche la pagina di proiezione, così funziona a telefono spento)
+  function autoApprovePending() {
+    if (!screenState.autoApprove || !fs) return;
+    photos.filter(p => stOf(p) === 'pending').forEach(p => fs.collection('foto').doc(p.id).update({ status: 'approved', approvedAt: Date.now() }).catch(() => {}));
+  }
+
+  // ====== LOTTERIA ======
+  function normLottery(d) {
+    d = d || {};
+    let drawn = null;
+    if (Array.isArray(d.drawn)) drawn = d.drawn.slice();
+    else if (d.drawn && typeof d.drawn === 'object') drawn = Object.values(d.drawn);
+    if (!drawn) { const prev = Array.isArray(d.previous) ? d.previous.slice().reverse() : []; drawn = prev; if (d.current && d.current !== '*' && d.current !== '****') drawn.push(d.current); }
+    drawn = drawn.map(String);
+    let status = d.status;
+    if (['not_started', 'live', 'ended'].indexOf(status) < 0) status = drawn.length ? 'live' : 'not_started';
+    return { status, drawn };
+  }
+  function buildLottery(status, drawn) {
+    return { status, drawn, current: drawn.length ? drawn[drawn.length - 1] : '*', previous: drawn.slice(0, -1).reverse().slice(0, 10) };
+  }
+  let lot = { status: 'not_started', drawn: [] };
+  function lotMutate(fn) {
+    return rtdb.ref('lottery').transaction(cur => { const r = fn(normLottery(cur)); if (!r) return; return buildLottery(r.status, r.drawn); }).catch(fail);
+  }
+  const parseNum = v => { const t = String(v).trim(); const n = parseInt(t, 10); return (!/^\d+$/.test(t) || isNaN(n) || n < 1 || n > 10000) ? null : String(n); };
+  function startLottery() { rtdb.ref('lottery').on('value', s => { lot = normLottery(s.val()); renderLottery(); }, fail); }
+  function renderLottery() {
+    [['stNot', 'not_started'], ['stLive', 'live'], ['stEnd', 'ended']].forEach(([id, s]) => $(id).classList.toggle('on', lot.status === s));
+    $('lotLast').textContent = lot.drawn.length ? lot.drawn[lot.drawn.length - 1] : '—';
+    $('lotCount').textContent = lot.drawn.length + ' chiamati';
+    const ae = document.activeElement;
+    if (ae && ae.tagName === 'INPUT' && $('lotList').contains(ae)) return;   // non ridisegnare mentre correggi un numero
+    const list = $('lotList'); list.textContent = '';
+    if (!lot.drawn.length) { list.innerHTML = '<div class="muted">Nessun numero ancora chiamato.</div>'; return; }
+    for (let i = lot.drawn.length - 1; i >= 0; i--) {
+      const num = lot.drawn[i], it = document.createElement('div');
+      it.className = 'lot-item' + (i === lot.drawn.length - 1 ? ' last' : '');
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = (i + 1) + '°';
+      const inp = document.createElement('input'); inp.type = 'text'; inp.inputMode = 'numeric'; inp.value = num; inp.dataset.old = num;
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+      inp.addEventListener('change', () => editNum(i, inp));
+      const del = document.createElement('button'); del.textContent = '✕'; del.setAttribute('aria-label', 'Elimina ' + num);
+      del.onclick = () => delNum(i, num);
+      it.append(n, inp, del); list.appendChild(it);
+    }
+  }
+  [['stNot', 'not_started'], ['stLive', 'live'], ['stEnd', 'ended']].forEach(([id, s]) => $(id).onclick = () => {
+    if (s === 'ended' && lot.status !== 'ended' && !confirm('Segnare la lotteria come terminata?')) return;
+    lotMutate(c => ({ status: s, drawn: c.drawn }));
+  });
+  function callNumber() {
+    const el = $('lotNew'), n = parseNum(el.value);
+    if (!n) { toast('Inserisci un numero da 1 a 10000', true); return; }
+    if (lot.drawn.includes(n) && !confirm('Il ' + n + ' è già stato chiamato. Aggiungerlo comunque?')) return;
+    if (lot.status === 'ended' && !confirm('La lotteria risulta terminata. Riaprirla e aggiungere il numero?')) return;
+    lotMutate(c => ({ status: 'live', drawn: c.drawn.concat(n) }));
+    el.value = ''; el.focus();
+  }
+  $('lotAdd').onclick = callNumber;
+  $('lotNew').addEventListener('keydown', e => { if (e.key === 'Enter') callNumber(); });
+  $('lotUndo').onclick = () => { if (!lot.drawn.length) return; const last = lot.drawn[lot.drawn.length - 1]; if (!confirm('Annullare l’ultimo numero (' + last + ')?')) return; lotMutate(c => { if (c.drawn[c.drawn.length - 1] !== last) return null; return { status: c.status, drawn: c.drawn.slice(0, -1) }; }); };
+  function editNum(i, inp) {
+    const old = inp.dataset.old, n = parseNum(inp.value);
+    if (!n) { toast('Numero non valido', true); inp.value = old; return; }
+    if (n === old) return;
+    if (lot.drawn.includes(n) && !confirm('Il ' + n + ' è già presente. Confermi la modifica?')) { inp.value = old; return; }
+    lotMutate(c => { if (c.drawn[i] !== old) return null; const d = c.drawn.slice(); d[i] = n; return { status: c.status, drawn: d }; }).then(() => { inp.dataset.old = n; inp.blur(); renderLottery(); });
+  }
+  function delNum(i, num) {
+    if (!confirm('Eliminare il numero ' + num + '?')) return;
+    lotMutate(c => { if (c.drawn[i] !== num) return null; const d = c.drawn.slice(); d.splice(i, 1); return { status: c.status, drawn: d }; });
+  }
+  $('lotReset').onclick = () => { if (confirm('Azzerare la lotteria? Tutti i numeri chiamati verranno cancellati.')) lotMutate(() => ({ status: 'not_started', drawn: [] })); };
+
+  // ====== SCHERMO ======
+  let screenState = { mode: 'auto', message: '', paused: false, autoApprove: false }, msgOpen = false, projSeen = 0;
+  function startScreen() {
+    rtdb.ref('screen').on('value', s => { screenState = Object.assign({ mode: 'auto', message: '', paused: false, autoApprove: false }, s.val() || {}); renderScreen(); autoApprovePending(); }, fail);
+    rtdb.ref('screenStatus/last').on('value', s => { projSeen = s.val() || 0; renderProj(); });
+    setInterval(renderProj, 5000);
+  }
+  function renderProj() {
+    const age = Date.now() - projSeen, el = $('projState');
+    if (!projSeen) el.textContent = 'La pagina di proiezione non si è ancora collegata.';
+    else if (age < 30000) el.innerHTML = '<b style="color:var(--green)">● Proiezione collegata</b>';
+    else el.innerHTML = '<b style="color:var(--red)">● Proiezione non raggiungibile</b> (ultimo segnale ' + Math.max(1, Math.round(age / 60000)) + ' min fa)';
+  }
+  function renderScreen() {
+    document.querySelectorAll('#modes .mode').forEach(b => b.classList.toggle('on', b.dataset.m === screenState.mode));
+    $('msgBox').classList.toggle('hidden', screenState.mode !== 'message' && !msgOpen);
+    if (document.activeElement !== $('msgText')) $('msgText').value = screenState.message || '';
+    $('swPause').checked = !!screenState.paused; $('swAuto').checked = !!screenState.autoApprove;
+  }
+  const upd = o => rtdb.ref('screen').update(o).catch(fail);
+  document.querySelectorAll('#modes .mode').forEach(b => b.onclick = () => {
+    if (b.dataset.m === 'message') { msgOpen = true; $('msgBox').classList.remove('hidden'); $('msgText').focus(); return; }
+    msgOpen = false; upd({ mode: b.dataset.m }).then(() => toast('Schermo aggiornato'));
+  });
+  MESSAGES.forEach(m => { const b = document.createElement('button'); b.textContent = m; b.onclick = () => { $('msgText').value = m; }; $('quick').appendChild(b); });
+  $('msgSend').onclick = () => { const t = $('msgText').value.trim(); if (!t) { toast('Scrivi un messaggio', true); return; } upd({ mode: 'message', message: t }); toast('Messaggio sullo schermo'); };
+  $('swPause').onchange = e => upd({ paused: e.target.checked });
+  $('swAuto').onchange = e => upd({ autoApprove: e.target.checked });
+  $('skipBtn').onclick = () => { upd({ skip: Date.now() }); toast('Saltato'); };
+
+  // Accesso automatico se la password è già stata inserita su questo telefono (va in fondo: serve che tutto sia definito)
+  if (load('regia') === '1') enter();
+})();
+</script>
+</body>
+</html>
