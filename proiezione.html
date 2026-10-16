@@ -152,11 +152,34 @@
   .v-qr .url { margin-top: 1.2rem; font-size: 2rem; font-weight: 800; color: var(--petrol, #1C6E8C); }
   #over[data-mode="logo"] { background: #fff; }
   .v-logo { overflow: hidden; }
+  /* Sfondo "acquerello vivo": macchie di colore che si spostano piano, l'acquerello originale che respira, gocce che sbocciano */
   .v-logo .wc { position: absolute; mix-blend-mode: multiply; pointer-events: none; user-select: none; }
-  .v-logo .wc.main { width: 78rem; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-  .v-logo .wc.a { width: 30rem; left: -6rem; top: -5rem; transform: rotate(160deg) scaleX(-1); opacity: .55; }
-  .v-logo .wc.b { width: 34rem; right: -8rem; bottom: -7rem; transform: rotate(-12deg); opacity: .6; }
-  .v-logo .brandmark { position: relative; width: 58rem; max-width: 80%; height: auto; filter: drop-shadow(0 .2rem .6rem rgba(255,255,255,.7)); }
+  .v-logo .wc.main { width: 78rem; left: 50%; top: 50%; margin: -34rem 0 0 -39rem; animation: wcBreath 46s ease-in-out infinite alternate; }
+  .v-logo .wc.a { width: 52rem; left: -14rem; top: -12rem; opacity: .55; filter: hue-rotate(-18deg) saturate(1.1); animation: wcA 62s ease-in-out infinite alternate; }
+  .v-logo .wc.b { width: 56rem; right: -16rem; bottom: -16rem; opacity: .6; filter: hue-rotate(22deg); animation: wcB 70s ease-in-out infinite alternate; }
+  .v-logo .bl { position: absolute; border-radius: 50%; mix-blend-mode: multiply; pointer-events: none; will-change: transform; }
+  .v-logo .bl.b1 { width: 62rem; height: 62rem; left: -8rem; top: 6rem; background: radial-gradient(circle, rgba(150,205,230,.62), rgba(150,205,230,0) 68%); animation: dr1 38s ease-in-out infinite alternate; }
+  .v-logo .bl.b2 { width: 54rem; height: 54rem; right: -6rem; top: -10rem; background: radial-gradient(circle, rgba(170,225,226,.60), rgba(170,225,226,0) 68%); animation: dr2 46s ease-in-out infinite alternate; }
+  .v-logo .bl.b3 { width: 58rem; height: 58rem; left: 30rem; bottom: -22rem; background: radial-gradient(circle, rgba(190,200,235,.55), rgba(190,200,235,0) 68%); animation: dr3 52s ease-in-out infinite alternate; }
+  .v-logo .bl.b4 { width: 34rem; height: 34rem; right: 8rem; bottom: 4rem; background: radial-gradient(circle, rgba(247,212,200,.55), rgba(247,212,200,0) 66%); animation: dr4 41s ease-in-out infinite alternate; }
+  .v-logo .bl.b5 { width: 30rem; height: 30rem; left: 10rem; top: -6rem; background: radial-gradient(circle, rgba(250,232,205,.55), rgba(250,232,205,0) 66%); animation: dr5 57s ease-in-out infinite alternate; }
+  .v-logo .drop { position: absolute; border-radius: 50%; mix-blend-mode: multiply; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(120,190,222,.5), rgba(120,190,222,0) 70%); animation: bloom 14s ease-out infinite; }
+  .v-logo .drop.d1 { width: 14rem; height: 14rem; left: 12%; top: 62%; animation-delay: 0s; }
+  .v-logo .drop.d2 { width: 10rem; height: 10rem; left: 82%; top: 22%; animation-delay: 3.5s; background: radial-gradient(circle, rgba(150,215,215,.5), rgba(150,215,215,0) 70%); }
+  .v-logo .drop.d3 { width: 12rem; height: 12rem; left: 70%; top: 74%; animation-delay: 7s; background: radial-gradient(circle, rgba(210,190,235,.45), rgba(210,190,235,0) 70%); }
+  .v-logo .drop.d4 { width: 9rem; height: 9rem; left: 22%; top: 14%; animation-delay: 10.5s; }
+  @keyframes wcBreath { from { transform: scale(.97) rotate(-2deg); } to { transform: scale(1.07) rotate(2.5deg) translate(1.5rem, -1rem); } }
+  @keyframes wcA { from { transform: rotate(160deg) scaleX(-1) translate(0, 0); } to { transform: rotate(178deg) scaleX(-1) translate(6rem, 5rem); } }
+  @keyframes wcB { from { transform: rotate(-12deg) translate(0, 0); } to { transform: rotate(-26deg) translate(-8rem, -5rem); } }
+  @keyframes dr1 { from { transform: translate(0, 0) scale(1); } to { transform: translate(34rem, -8rem) scale(1.25); } }
+  @keyframes dr2 { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-30rem, 14rem) scale(.9); } }
+  @keyframes dr3 { from { transform: translate(0, 0) scale(.9); } to { transform: translate(-26rem, -16rem) scale(1.2); } }
+  @keyframes dr4 { from { transform: translate(0, 0) scale(1); } to { transform: translate(-22rem, -10rem) scale(1.35); } }
+  @keyframes dr5 { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(28rem, 12rem) scale(.85); } }
+  @keyframes bloom { 0% { opacity: 0; transform: scale(.2); } 18% { opacity: .9; } 100% { opacity: 0; transform: scale(3.2); } }
+  @keyframes floaty { from { transform: translateY(-.5rem); } to { transform: translateY(.6rem); } }
+  .v-logo .brandmark { position: relative; width: 58rem; max-width: 80%; height: auto; filter: drop-shadow(0 .2rem .6rem rgba(255,255,255,.7)); animation: floaty 9s ease-in-out infinite alternate; }
+  @media (prefers-reduced-motion: reduce) { .v-logo * { animation: none !important; } }
   .v-message svg { width: 5rem; height: 5rem; color: var(--coral, #E8704F); margin-bottom: 1.6rem; }
   .v-message .msg { font-size: 6.4rem; font-weight: 800; line-height: 1.1; max-width: 68rem; }
 
@@ -249,7 +272,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     <div class="url" id="urlOver"></div>
   </section>
   <section class="ov v-logo">
+    <div class="bl b1"></div><div class="bl b2"></div><div class="bl b3"></div><div class="bl b4"></div><div class="bl b5"></div>
+    <img class="wc a" src="altro/sfondo-acquerello.png" alt="">
+    <img class="wc b" src="altro/sfondo-acquerello.png" alt="">
     <img class="wc main" src="altro/sfondo-acquerello.png" alt="">
+    <div class="drop d1"></div><div class="drop d2"></div><div class="drop d3"></div><div class="drop d4"></div>
     <img class="brandmark" src="altro/logo-header.png" alt="Il sorriso di Alice">
   </section>
   <section class="ov v-message">
