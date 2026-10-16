@@ -152,34 +152,11 @@
   .v-qr .url { margin-top: 1.2rem; font-size: 2rem; font-weight: 800; color: var(--petrol, #1C6E8C); }
   #over[data-mode="logo"] { background: #fff; }
   .v-logo { overflow: hidden; }
-  /* Sfondo "acquerello vivo": macchie di colore che si spostano piano, l'acquerello originale che respira, gocce che sbocciano */
-  .v-logo .wc { position: absolute; mix-blend-mode: multiply; pointer-events: none; user-select: none; }
-  .v-logo .wc.main { width: 78rem; left: 50%; top: 50%; margin: -34rem 0 0 -39rem; animation: wcBreath 46s ease-in-out infinite alternate; }
-  .v-logo .wc.a { width: 52rem; left: -14rem; top: -12rem; opacity: .55; filter: hue-rotate(-18deg) saturate(1.1); animation: wcA 62s ease-in-out infinite alternate; }
-  .v-logo .wc.b { width: 56rem; right: -16rem; bottom: -16rem; opacity: .6; filter: hue-rotate(22deg); animation: wcB 70s ease-in-out infinite alternate; }
-  .v-logo .bl { position: absolute; border-radius: 50%; mix-blend-mode: multiply; pointer-events: none; will-change: transform; }
-  .v-logo .bl.b1 { width: 62rem; height: 62rem; left: -8rem; top: 6rem; background: radial-gradient(circle, rgba(150,205,230,.62), rgba(150,205,230,0) 68%); animation: dr1 38s ease-in-out infinite alternate; }
-  .v-logo .bl.b2 { width: 54rem; height: 54rem; right: -6rem; top: -10rem; background: radial-gradient(circle, rgba(170,225,226,.60), rgba(170,225,226,0) 68%); animation: dr2 46s ease-in-out infinite alternate; }
-  .v-logo .bl.b3 { width: 58rem; height: 58rem; left: 30rem; bottom: -22rem; background: radial-gradient(circle, rgba(190,200,235,.55), rgba(190,200,235,0) 68%); animation: dr3 52s ease-in-out infinite alternate; }
-  .v-logo .bl.b4 { width: 34rem; height: 34rem; right: 8rem; bottom: 4rem; background: radial-gradient(circle, rgba(247,212,200,.55), rgba(247,212,200,0) 66%); animation: dr4 41s ease-in-out infinite alternate; }
-  .v-logo .bl.b5 { width: 30rem; height: 30rem; left: 10rem; top: -6rem; background: radial-gradient(circle, rgba(250,232,205,.55), rgba(250,232,205,0) 66%); animation: dr5 57s ease-in-out infinite alternate; }
-  .v-logo .drop { position: absolute; border-radius: 50%; mix-blend-mode: multiply; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(120,190,222,.5), rgba(120,190,222,0) 70%); animation: bloom 14s ease-out infinite; }
-  .v-logo .drop.d1 { width: 14rem; height: 14rem; left: 12%; top: 62%; animation-delay: 0s; }
-  .v-logo .drop.d2 { width: 10rem; height: 10rem; left: 82%; top: 22%; animation-delay: 3.5s; background: radial-gradient(circle, rgba(150,215,215,.5), rgba(150,215,215,0) 70%); }
-  .v-logo .drop.d3 { width: 12rem; height: 12rem; left: 70%; top: 74%; animation-delay: 7s; background: radial-gradient(circle, rgba(210,190,235,.45), rgba(210,190,235,0) 70%); }
-  .v-logo .drop.d4 { width: 9rem; height: 9rem; left: 22%; top: 14%; animation-delay: 10.5s; }
-  @keyframes wcBreath { from { transform: scale(.97) rotate(-2deg); } to { transform: scale(1.07) rotate(2.5deg) translate(1.5rem, -1rem); } }
-  @keyframes wcA { from { transform: rotate(160deg) scaleX(-1) translate(0, 0); } to { transform: rotate(178deg) scaleX(-1) translate(6rem, 5rem); } }
-  @keyframes wcB { from { transform: rotate(-12deg) translate(0, 0); } to { transform: rotate(-26deg) translate(-8rem, -5rem); } }
-  @keyframes dr1 { from { transform: translate(0, 0) scale(1); } to { transform: translate(34rem, -8rem) scale(1.25); } }
-  @keyframes dr2 { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(-30rem, 14rem) scale(.9); } }
-  @keyframes dr3 { from { transform: translate(0, 0) scale(.9); } to { transform: translate(-26rem, -16rem) scale(1.2); } }
-  @keyframes dr4 { from { transform: translate(0, 0) scale(1); } to { transform: translate(-22rem, -10rem) scale(1.35); } }
-  @keyframes dr5 { from { transform: translate(0, 0) scale(1.1); } to { transform: translate(28rem, 12rem) scale(.85); } }
-  @keyframes bloom { 0% { opacity: 0; transform: scale(.2); } 18% { opacity: .9; } 100% { opacity: 0; transform: scale(3.2); } }
+  /* Sfondo "acquerello vivo": generato in JavaScript (canvas), nessuna immagine */
+  .v-logo #wcCanvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .v-logo .brandmark { position: relative; width: 58rem; max-width: 80%; height: auto; filter: drop-shadow(0 .2rem .8rem rgba(255,255,255,.85)); animation: floaty 9s ease-in-out infinite alternate; }
   @keyframes floaty { from { transform: translateY(-.5rem); } to { transform: translateY(.6rem); } }
-  .v-logo .brandmark { position: relative; width: 58rem; max-width: 80%; height: auto; filter: drop-shadow(0 .2rem .6rem rgba(255,255,255,.7)); animation: floaty 9s ease-in-out infinite alternate; }
-  @media (prefers-reduced-motion: reduce) { .v-logo * { animation: none !important; } }
+  @media (prefers-reduced-motion: reduce) { .v-logo .brandmark { animation: none; } }
   .v-message svg { width: 5rem; height: 5rem; color: var(--coral, #E8704F); margin-bottom: 1.6rem; }
   .v-message .msg { font-size: 6.4rem; font-weight: 800; line-height: 1.1; max-width: 68rem; }
 
@@ -272,11 +249,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     <div class="url" id="urlOver"></div>
   </section>
   <section class="ov v-logo">
-    <div class="bl b1"></div><div class="bl b2"></div><div class="bl b3"></div><div class="bl b4"></div><div class="bl b5"></div>
-    <img class="wc a" src="altro/sfondo-acquerello.png" alt="">
-    <img class="wc b" src="altro/sfondo-acquerello.png" alt="">
-    <img class="wc main" src="altro/sfondo-acquerello.png" alt="">
-    <div class="drop d1"></div><div class="drop d2"></div><div class="drop d3"></div><div class="drop d4"></div>
+    <canvas id="wcCanvas" width="256" height="144"></canvas>
     <img class="brandmark" src="altro/logo-header.png" alt="Il sorriso di Alice">
   </section>
   <section class="ov v-message">
@@ -649,14 +622,62 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     } else if (!screen.autoApprove && unsubPending) { unsubPending(); unsubPending = null; }
   }
 
+
+  // ============ Sfondo acquerello animato (pagina Logo) ============
+  // Rumore frattale con distorsione del dominio, a bassa risoluzione e poi ingrandito: macchie morbide che si
+  // fondono e scorrono piano, nelle tinte del logo (azzurro, acqua, lavanda, un velo di pesca). Gira solo con la pagina Logo attiva.
+  const WC = (() => {
+    const W = 256, H = 144;
+    const cv = $('wcCanvas'); if (!cv) return { sync() {} };
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(W, H), px = img.data;
+    const P = new Uint8Array(512); { const p = Array.from({ length: 256 }, (_, i) => i); for (let i = 255; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [p[i], p[j]] = [p[j], p[i]]; } for (let i = 0; i < 512; i++) P[i] = p[i & 255]; }
+    const fade = t => t * t * t * (t * (t * 6 - 15) + 10), lerp = (a, b, t) => a + (b - a) * t;
+    const grad = (h, x, y) => { const u = (h & 1) ? x : -x, v = (h & 2) ? y : -y; return u + v; };
+    function noise(x, y) {
+      const X = Math.floor(x) & 255, Y = Math.floor(y) & 255; x -= Math.floor(x); y -= Math.floor(y);
+      const u = fade(x), v = fade(y), a = P[X] + Y, b = P[X + 1] + Y;
+      return lerp(lerp(grad(P[a], x, y), grad(P[b], x - 1, y), u), lerp(grad(P[a + 1], x, y - 1), grad(P[b + 1], x - 1, y - 1), u), v);
+    }
+    const fbm = (x, y) => noise(x, y) * .6 + noise(x * 2.03 + 5.2, y * 2.03 + 1.3) * .28 + noise(x * 4.1 + 9.7, y * 4.1 + 3.1) * .12;
+    // tavolozza: da carta bianca ad azzurro profondo, con lavanda e pesca come accenti
+    const STOPS = [[0, 252, 254, 254], [.22, 222, 242, 246], [.42, 186, 228, 232], [.58, 160, 208, 234], [.74, 140, 186, 224], [.9, 182, 192, 228], [1, 238, 218, 214]];
+    function pal(v) { v = v < 0 ? 0 : v > 1 ? 1 : v; for (let i = 1; i < STOPS.length; i++) if (v <= STOPS[i][0]) { const a = STOPS[i - 1], b = STOPS[i], k = (v - a[0]) / (b[0] - a[0]); return [a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k, a[3] + (b[3] - a[3]) * k]; } return STOPS[STOPS.length - 1].slice(1); }
+    const LUT = Array.from({ length: 256 }, (_, i) => pal(i / 255));
+    let raf = 0, t0 = 0, last = 0;
+    function frame(now) {
+      raf = requestAnimationFrame(frame);
+      if (now - last < 50) return;                 // ~20 fotogrammi al secondo bastano per un movimento lento
+      last = now; const t = (now - t0) / 1000 * .02;
+      let i = 0;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const nx = x / W * 2.1, ny = y / W * 2.1;                       // x e y alla stessa scala
+        const wx = fbm(nx + t * 1.3, ny - t * .9), wy = fbm(nx - t * .8 + 7.7, ny + t * 1.1 + 2.4);
+        let v = fbm(nx + wx * 1.0 + t * .6, ny + wy * 1.0 - t * .5) * .95 + .5;
+        const edge = Math.abs(Math.sin(v * 13)); v += (edge < .07 ? (.07 - edge) * .3 : 0);   // bordo di pigmento appena più scuro
+        v += (x / W - .5) * -.08;                                        // leggera luce da sinistra
+        const c = LUT[Math.max(0, Math.min(255, (v * 255) | 0))];
+        px[i++] = c[0]; px[i++] = c[1]; px[i++] = c[2]; px[i++] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    function sync() {
+      const on = $('over').classList.contains('on') && $('over').dataset.mode === 'logo' && !document.hidden;
+      if (on && !raf) { t0 = performance.now() - 20000; raf = requestAnimationFrame(frame); }
+      else if (!on && raf) { cancelAnimationFrame(raf); raf = 0; }
+    }
+    document.addEventListener('visibilitychange', sync);
+    return { sync };
+  })();
+
   function applyOverlay() {
     const o = $('over'), m = screen.mode;
-    if (m === 'auto') { o.classList.remove('on'); return; }
+    if (m === 'auto') { o.classList.remove('on'); WC.sync(); return; }
     o.dataset.mode = m;
     if (m === 'message') $('ovMsg').textContent = screen.message || '';
     if (m === 'partners') buildOverWall();
     if (m === 'lottery') renderLotteryView();
     o.classList.add('on');
+    WC.sync();
   }
 
   function buildOverWall() {
