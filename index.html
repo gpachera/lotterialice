@@ -694,23 +694,45 @@
     window.scrollTo(0, 0);
   }
 
+  const PHOTO_ERR = 'Non riesco a leggere questa foto (formato non supportato, oppure non è ancora scaricata sul telefono).';
+  // Ridimensiona la foto e la restituisce come data URL JPEG (≤ ~700 KB). Niente blob: (la CSP del sito non li consente).
+  // 1) createImageBitmap: decodifica nativa, regge anche le foto enormi dei telefoni Android e rispetta l'orientamento;
+  // 2) in alternativa FileReader + Image.
   function resizeImage(file, maxSide = 1000) {
-    // Niente blob: legge il file come data: URL (consentito dalla CSP della pagina)
+    // mai in attesa all'infinito: se la foto non si legge entro 25 secondi, errore chiaro
+    return Promise.race([resizeImageInner(file, maxSide), new Promise((_, rej) => setTimeout(() => rej(new Error(PHOTO_ERR)), 25000))]);
+  }
+  async function resizeImageInner(file, maxSide) {
+    const draw = (src, sw, sh) => {
+      const s = Math.min(1, maxSide / Math.max(sw, sh));
+      const w = Math.max(1, Math.round(sw * s)), h = Math.max(1, Math.round(sh * s));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, w, h);   // PNG trasparenti: sfondo bianco, non nero
+      x.drawImage(src, 0, 0, w, h);
+      let q = 0.8, out = c.toDataURL('image/jpeg', q);
+      while (out.length > 700000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+      if (!out || out.length < 100) throw new Error(PHOTO_ERR);
+      return out;
+    };
+    if (window.createImageBitmap) {
+      try {
+        let bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+        const s = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+        if (s < 0.5) {   // foto molto grande: si rilegge già ridotta, per non saturare la memoria
+          const W = Math.round(bmp.width * s), H = Math.round(bmp.height * s);
+          try { bmp.close && bmp.close(); bmp = await createImageBitmap(file, { imageOrientation: 'from-image', resizeWidth: W, resizeHeight: H, resizeQuality: 'medium' }); }
+          catch (e) { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+        }
+        const out = draw(bmp, bmp.width, bmp.height); bmp.close && bmp.close(); return out;
+      } catch (e) { console.warn('createImageBitmap non riuscito, provo con FileReader:', e); }
+    }
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onerror = () => reject(new Error('Non riesco a leggere questa foto. Prova con un\'altra.'));
+      reader.onerror = () => reject(new Error(PHOTO_ERR));
       reader.onload = () => {
         const img = new Image();
-        img.onload = () => {
-          const s = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight));
-          const w = Math.round(img.naturalWidth * s), h = Math.round(img.naturalHeight * s);
-          const c = document.createElement('canvas'); c.width = w; c.height = h;
-          c.getContext('2d').drawImage(img, 0, 0, w, h);
-          let q = 0.8, out = c.toDataURL('image/jpeg', q);
-          while (out.length > 700000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
-          resolve(out);
-        };
-        img.onerror = () => reject(new Error('Non riesco a leggere questa foto. Prova con un\'altra.'));
+        img.onload = () => { try { resolve(draw(img, img.naturalWidth, img.naturalHeight)); } catch (e) { reject(e); } };
+        img.onerror = () => reject(new Error(PHOTO_ERR));
         img.src = reader.result;
       };
       reader.readAsDataURL(file);
@@ -748,7 +770,14 @@
       if (file) {
         progressContainer.style.display = 'block';
         progressBar.style.width = '40%'; progressBar.textContent = '…';
-        imageUrl = await resizeImage(file);   // foto ridimensionata e salvata nel database (niente Storage)
+        try {
+          imageUrl = await resizeImage(file);   // foto ridimensionata e salvata nel database (niente Storage)
+        } catch (pe) {
+          console.error('Foto non leggibile:', pe);
+          // il saluto non va perso: si può inviare comunque senza foto
+          if (!confirm(PHOTO_ERR + '\n\nVuoi inviare il saluto senza foto?\n(OK = invia senza foto, Annulla = scegli un\'altra foto)')) return;
+          imageUrl = null;
+        }
         progressBar.style.width = '100%'; progressBar.textContent = '100%';
       }
 
