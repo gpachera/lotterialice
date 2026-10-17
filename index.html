@@ -190,6 +190,15 @@
   .lottery-status { display: inline-block; margin-bottom: 4px; padding: 4px 12px; border-radius: 999px; background: #E6F5ED; color: #1E6B45; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
   .draw-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
   .draw-chip { min-width: 54px; padding: 7px 12px; border-radius: 999px; background: var(--sand); color: #6B4E34; font-size: 1.05rem; font-weight: 800; text-align: center; }
+  .lot-search { margin: 0 0 18px; text-align: left; }
+  .lot-search input { width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 14px; border: 2px solid var(--sand); background: #fff; font: inherit; font-size: 1.15rem; font-weight: 700; }
+  .lot-search input:focus { outline: none; border-color: var(--primary); }
+  .lot-res { margin-top: 10px; display: grid; gap: 8px; }
+  .lot-res .r { padding: 11px 14px; border-radius: 12px; background: var(--sand); color: #6B4E34; font-weight: 700; }
+  .lot-res .r b { font-size: 1.15rem; }
+  .lot-res .r.hit { background: #DDF3E6; color: #1D6B40; }
+  .lot-res .r.info { background: #fff; border: 2px dashed var(--sand); font-weight: 600; }
+  .draw-chip.is-match { outline: 3px solid #2F8F5B; background: #DDF3E6; color: #1D6B40; box-shadow: none; }
   .draw-chip.is-last { background: var(--coral); color: #fff; box-shadow: 0 4px 10px rgba(232,112,79,0.3); }
 
   .partners-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; margin-top: 14px; }
@@ -223,7 +232,6 @@
   <header class="hero">
     <img class="hero-logo" src="altro/logo-header.png" alt="Il sorriso di Alice" onerror="this.style.display='none'" />
     <span class="eyebrow">Pranzo di beneficenza</span>
-    <h1>Grazie di essere qui</h1>
   </header>
 
   <button class="card-primary" onclick="showSection('uploadSection')">
@@ -351,6 +359,11 @@
   <div class="section-card">
     <h2>Lotteria</h2>
     <p class="section-intro">Segui l'estrazione: i numeri si aggiornano da soli.</p>
+    <div class="lot-search">
+      <label class="field" for="lotSearch" style="margin-top:0">Controlla i tuoi biglietti</label>
+      <input id="lotSearch" type="text" inputmode="numeric" autocomplete="off" placeholder="Scrivi uno o più numeri" />
+      <div class="lot-res" id="lotSearchRes"></div>
+    </div>
     <div class="lottery-live">
       <div class="lottery-current" id="lotteryCurrentNumber">
         <div class="lottery-inactive">Caricamento...</div>
@@ -435,7 +448,23 @@
   const firestore = firebase.firestore();
   const database = firebase.database();
 
-  firebase.auth().signInAnonymously()
+  // Accesso anonimo, con un secondo tentativo senza salvataggio locale: alcuni browser interni (WhatsApp, Facebook,
+  // Instagram, navigazione privata) bloccano IndexedDB e l'accesso fallirebbe, facendo respingere poi il caricamento.
+  let authPromise = null;
+  function ensureAuth() {
+    if (firebase.auth().currentUser) return Promise.resolve();
+    if (!authPromise) {
+      authPromise = firebase.auth().signInAnonymously().catch(async e1 => {
+        console.warn('Accesso anonimo, secondo tentativo:', e1);
+        try {
+          await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+          await firebase.auth().signInAnonymously();
+        } catch (e2) { authPromise = null; throw e2; }
+      });
+    }
+    return authPromise;
+  }
+  ensureAuth()
     .then(() => {
       console.log("Utente autenticato anonimamente.");
       loadBackgroundImage();
@@ -536,8 +565,33 @@
 
   let lotteryListener = null;
 
+  // ---- Cerca i tuoi numeri tra quelli chiamati ----
+  let lotNow = { status: 'not_started', drawn: [] };
+  const sameNum = (a, b) => String(a).trim() === String(b).trim() || (/^\d+$/.test(String(a).trim()) && /^\d+$/.test(String(b).trim()) && Number(a) === Number(b));
+  function checkNumbers() {
+    const box = document.getElementById('lotSearchRes'); if (!box) return;
+    box.textContent = '';
+    const q = (document.getElementById('lotSearch').value || '').split(/[^0-9A-Za-z]+/).filter(Boolean).slice(0, 12);
+    const add = (cls, html) => { const d = document.createElement('div'); d.className = 'r ' + cls; d.innerHTML = html; box.appendChild(d); };
+    document.querySelectorAll('#lotteryPreviousNumbers .draw-chip').forEach(c => c.classList.remove('is-match'));
+    if (!q.length) return;
+    if (lotNow.status === 'not_started') { add('info', 'La lotteria non è ancora iniziata: riprova quando comincia l\u2019estrazione.'); return; }
+    q.forEach(n => {
+      const i = lotNow.drawn.findIndex(x => sameNum(x, n));
+      const safe = n.replace(/[<>&"]/g, '');
+      if (i >= 0) {
+        add('hit', '<b>' + safe + '</b> \u2014 è stato chiamato! (' + (i + 1) + '\u00BA numero estratto)');
+        document.querySelectorAll('#lotteryPreviousNumbers .draw-chip').forEach(c => { if (sameNum(c.textContent, n)) c.classList.add('is-match'); });
+      } else {
+        add('', '<b>' + safe + '</b> \u2014 ' + (lotNow.status === 'ended' ? 'non è stato estratto' : 'non è ancora uscito'));
+      }
+    });
+  }
+  document.addEventListener('DOMContentLoaded', () => { const s = document.getElementById('lotSearch'); if (s) s.addEventListener('input', checkNumbers); });
+
   function renderLottery(raw) {
     const st = normLottery(raw);
+    lotNow = st;
     const currentDiv = document.getElementById('lotteryCurrentNumber');
     const listSection = document.getElementById('lotteryPreviousSection');
     const listDiv = document.getElementById('lotteryPreviousNumbers');
@@ -556,6 +610,7 @@
     if (st.status === 'not_started') {
       msg('lottery-inactive', 'La lotteria non è ancora iniziata');
       listSection.style.display = 'none';
+      checkNumbers();
       return;
     }
 
@@ -584,6 +639,7 @@
     } else {
       listSection.style.display = 'none';
     }
+    checkNumbers();
   }
 
   function startLotteryListener() {
@@ -696,21 +752,29 @@
         progressBar.style.width = '100%'; progressBar.textContent = '100%';
       }
 
-      await firestore.collection('foto').add({
-        name,
-        dedica,
-        imageUrl: imageUrl,
-        status: 'pending',
-        shown: false,
-        timestamp: Date.now()
-      });
+      const doc = { name, dedica, imageUrl: imageUrl, status: 'pending', shown: false, timestamp: Date.now() };
+      await ensureAuth();
+      try {
+        await firestore.collection('foto').add(doc);
+      } catch (e1) {
+        if (!/permission/i.test((e1 && (e1.code || e1.message)) || '')) throw e1;
+        // permessi negati: di solito l'accesso anonimo non era valido. Si rifà l'accesso e si riprova una volta.
+        authPromise = null;
+        try { await firebase.auth().signOut(); } catch (x) {}
+        await ensureAuth();
+        await firestore.collection('foto').add(doc);
+      }
 
       document.getElementById('uploadForm').style.display = 'none';
       document.getElementById('uploadSuccess').hidden = false;
       window.scrollTo(0, 0);
 
     } catch (e) {
-      alert("Errore durante il caricamento: " + e.message);
+      console.error('Caricamento non riuscito:', e);
+      const perm = /permission/i.test((e && (e.code || e.message)) || '');
+      alert(perm
+        ? "Non riesco a inviare il saluto da questo browser. Riprova tra un momento; se non funziona apri il link direttamente in Chrome o Safari (non dall'app di messaggistica) e riprova.\n\n(Dettaglio: permessi negati)"
+        : "Errore durante il caricamento: " + (e && e.message ? e.message : e));
     } finally {
       uploadBtn.disabled = false;
       loader.style.display = 'none';
