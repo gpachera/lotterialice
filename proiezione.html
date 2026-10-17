@@ -701,12 +701,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   // ============ Titoli di coda: sponsor che scorrono a sinistra, volontari a destra ============
   // Dati dalla regia: RTDB credits = { speed: 'slow'|'medium'|'fast', groups: { id: { name, order, names: "uno per riga" } } }
   const CR = (() => {
-    let data = {}, raf = 0, last = 0, left = null, right = null, active = false;
+    let data = {}, defaults = {}, raf = 0, last = 0, left = null, right = null, active = false;
+    fetch('altro/volontari.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {}).then(d => { defaults = d.groups || {}; if ($('over').dataset.mode === 'credits') build(); }).catch(() => {});
     const SPEED = { slow: 2.0, medium: 3.0, fast: 4.4 };   // rem al secondo
     const remPx = () => parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
     const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
     function groups() {
-      const g = data.groups || {};
+      const g = data.groups || (data.seeded ? {} : defaults);   // finché la regia non salva nulla, vale l'elenco predefinito
       return Object.keys(g).map(id => g[id]).filter(x => x && x.names).sort((a, b) => (a.order || 0) - (b.order || 0))
         .map(x => ({ name: x.name || '', names: String(x.names).split('\n').map(s => s.trim()).filter(Boolean) })).filter(x => x.names.length);
     }
@@ -731,7 +732,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         [...sp.children].forEach(c => sp.appendChild(c.cloneNode(true)));
         left.h = h1;
       }
-      right = { el: vo, y: voView, h: vo.scrollHeight, view: voView, pause: 0 };
+      right = { el: vo, y: voView * .4, h: vo.scrollHeight, view: voView, pause: 0 };
     }
     function frame(now) {
       raf = requestAnimationFrame(frame);

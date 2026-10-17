@@ -1,0 +1,34 @@
+{
+ "groups": {
+  "g1": {
+   "name": "Cucina",
+   "order": 10,
+   "names": "Fasoli Simone\nPachera Simone\nPachera Franco\nSandri Giuseppe\nMeneghini Claudio\nRoberto Mazzi\nMolon Alessandro\nMerzari Eliseo"
+  },
+  "g2": {
+   "name": "Sala",
+   "order": 20,
+   "names": "Pietropoli Paolo\nZandonà Aldo\nCesarano Raffaele\nBelloni Francesca\nGrigolini Maria\nPerina Valentina\nFasoli Milena\nScandola Sofia\nSignorato Carlo\nSignorato Giovanni\nPietropoli Luca\nPietropoli Benedetta\nMazzi Elia\nMarchiotto Margherita\nCorradini Monica\nCorradini Emanuela\nMazzi Benedetta\nCosta Federica\nAdamoli Nicoletta\nPoli Sara\nMerzari Luisa\nAdamoli Sabrina\nTomelleri Annarita\nTornieri Rita"
+  },
+  "g3": {
+   "name": "Preparazione lotteria",
+   "order": 30,
+   "names": "Pachera Mariolina\nPachera Ornella"
+  },
+  "g4": {
+   "name": "Preparazione segnaposti",
+   "order": 40,
+   "names": "Cazzadori Cristina\nDal Pozzo Marisa\nAvesani MariaGrazia\nMazzi Gabriella\nBoschetti Marilisa\nDal Pozzo Rosa\nPiccoli Dalia\nMarchesini Annamaria"
+  },
+  "g5": {
+   "name": "Tecnico",
+   "order": 50,
+   "names": "Pachera Giangaetano"
+  },
+  "g6": {
+   "name": "Direttivo Fibrosi Cistica",
+   "order": 60,
+   "names": "Righetti Orietta\nBelloni Roberto\nZardini Chiara\nCastellari Marco\nManzato Andrea\nMazzi Gianluigi\nGino Brentegani"
+  }
+ }
+}

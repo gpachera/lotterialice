@@ -431,7 +431,18 @@
   let crData = {}; const crDirty = new Set();
   const crGroups = () => Object.keys(crData.groups || {}).map(id => Object.assign({ id }, crData.groups[id])).sort((a, b) => (a.order || 0) - (b.order || 0));
   const crCount = s => String(s || '').split('\n').map(x => x.trim()).filter(Boolean).length;
-  function startCredits() { rtdb.ref('credits').on('value', s => { crData = s.val() || {}; renderCredits(); }, fail); }
+  let crSeeding = false;
+  function startCredits() { rtdb.ref('credits').on('value', s => { crData = s.val() || {}; renderCredits(); crSeed(); }, fail); }
+  // Prima volta: carica l'elenco predefinito dei volontari (altro/volontari.json), una sola volta
+  async function crSeed() {
+    if (crSeeding || crData.groups || crData.seeded) return; crSeeding = true;
+    try {
+      const r = await fetch('altro/volontari.json', { cache: 'no-cache' }); if (!r.ok) return;
+      const d = await r.json(); if (!d.groups) return;
+      const u = { seeded: true }; Object.keys(d.groups).forEach(k => u['groups/' + k] = d.groups[k]);
+      await rtdb.ref('credits').update(u); toast('Elenco volontari caricato');
+    } catch (e) { console.error(e); }
+  }
   function renderCredits() {
     document.querySelectorAll('#crSpeed button').forEach(b => b.classList.toggle('on', b.dataset.s === (crData.speed || 'medium')));
     const gs = crGroups(), box = $('crList');

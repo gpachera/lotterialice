@@ -18,12 +18,13 @@ Il database resta su Firebase (progetto lotteria-bd6c9): Realtime Database + Fir
 Le pagine operatore hanno nomi poco ovvi: non condividerne i link.
 
 REGIA DAL TELEFONO (cms-m4q9.html)
-Quattro schede: Foto (approva/rifiuta/elimina), Lotteria (stato, numeri, correzioni), Schermo (cosa mostra la proiezione), Sponsor (Gold/Silver/Standard, nascondi, aggiungi).
+Cinque schede: Foto (approva/rifiuta/elimina), Lotteria (stato, numeri, correzioni), Schermo (cosa mostra la proiezione), Sponsor (Gold/Silver/Standard, nascondi, aggiungi), Titoli (titoli di coda: gruppi di volontari, velocita', avvio).
 La password si cambia nella riga "const PASSWORD" all'inizio dello script del file.
 Per comandare la proiezione servono due nodi nel Realtime Database: "screen" e "screenStatus".
 Se nella regia compare "il database non permette questa operazione", in Firebase > Realtime Database > Regole
 aggiungi questi due nodi accanto a "lottery" (senza cancellare le regole che gia' ci sono):
     "screen":       { ".read": true, ".write": "auth != null" },
     "screenStatus": { ".read": true, ".write": "auth != null" },
-    "sponsors":     { ".read": true, ".write": "auth != null" }
-(il nodo "sponsors" serve alla scheda Sponsor: se manca, i loghi si vedono lo stesso ma senza priorita' e modifiche)
+    "sponsors":     { ".read": true, ".write": "auth != null" },
+    "credits":      { ".read": true, ".write": "auth != null" }
+(il nodo "sponsors" serve alla scheda Sponsor, "credits" alla scheda Titoli: se mancano, il resto funziona lo stesso)
