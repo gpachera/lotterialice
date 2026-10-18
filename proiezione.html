@@ -47,7 +47,15 @@
   @keyframes beat { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.12); } }
 
   /* ---------- Struttura ---------- */
-  #screen { display: grid; grid-template-columns: 42fr 58fr; width: 100%; height: 100%; }
+  #screen { display: grid; grid-template-columns: 42fr 58fr; width: 100%; height: 100%; transition: grid-template-columns .7s ease; }
+  #screen.big-photo { grid-template-columns: 62fr 38fr; }
+  /* con una foto: intestazione e piè di pagina più compatti, per dare più spazio alla foto */
+  #screen.big-photo .brand { height: 3.8rem; margin-bottom: .4rem; transition: height .7s ease; }
+  #screen.big-photo .guest { padding-top: 1.2rem; padding-bottom: 1rem; }
+  #screen.big-photo .guest.has-card .guest-foot { height: 5.4rem; padding-top: .5rem; }
+  #screen.big-photo .guest-foot .qr-box { width: 4.6rem; height: 4.6rem; padding: .4rem; border-radius: .8rem; }
+  #screen.big-photo .guest-foot .txt strong { font-size: 1.3rem; }
+  #screen.big-photo .guest-foot .txt span { font-size: 1rem; }   /* con una foto, la metà dei saluti si allarga */
 
   /* ---------- Metà sinistra: i saluti ---------- */
   .guest { position: relative; display: flex; flex-direction: column; padding: 2rem 2.4rem 1.6rem; background: var(--paper); min-width: 0; }
@@ -75,7 +83,7 @@
   .card-inner { display: flex; flex-direction: column; align-items: center; width: 100%; }
   .polaroid {
     position: relative; background: var(--white);
-    padding: .8rem .8rem 2.2rem; border-radius: .3rem;
+    padding: 1rem 1rem 2.6rem; border-radius: .3rem;
     box-shadow: 0 .6rem 1.8rem rgba(70, 40, 15, .22);
     transform: rotate(-1.6deg); margin-bottom: 1.6rem;
   }
@@ -83,7 +91,7 @@
     content: ""; position: absolute; top: -.9rem; left: 50%; width: 6rem; height: 1.7rem;
     transform: translateX(-50%) rotate(2deg); background: rgba(232, 112, 79, .38); border-radius: .2rem;
   }
-  .polaroid img { display: block; max-width: 25rem; max-height: var(--photoH, 15rem); object-fit: contain; border-radius: .15rem; }
+  .polaroid img { display: block; max-width: 44rem; max-height: var(--photoH, 15rem); object-fit: contain; border-radius: .15rem; }
   .no-photo .polaroid { display: none; }
   .quote-heart { display: none; width: 4rem; height: 4rem; color: var(--coral); margin-bottom: 1.2rem; }
   .no-photo .quote-heart { display: block; }
@@ -545,7 +553,11 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   }
 
   // ============ Schermo: attesa o saluto ============
-  function setMode(mode) {
+  function setMode(mode, big) {
+    const bigOn = mode === 'card' && !!big;
+    $('screen').classList.toggle('big-photo', bigOn);
+    const g = $('logosGrid'), n = g.children.length;   // metà destra più stretta: una colonna di loghi in meno
+    if (n > 0 && g.querySelector('.logo-card')) { const cols = bigOn ? (n >= 10 ? 3 : 2) : (n >= 10 ? 4 : n >= 5 ? 3 : 2); g.style.setProperty('--cols', cols); g.style.setProperty('--rows', Math.ceil(n / cols)); }
     $('waiting').classList.toggle('on', mode === 'waiting');
     $('card').classList.toggle('on', mode === 'card');
     $('guestFoot').classList.toggle('on', mode === 'card');
@@ -558,8 +570,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     const root = parseFloat(getComputedStyle(document.documentElement).fontSize);
     let size = parseFloat(getComputedStyle(dedica).fontSize) / root;
     let photo = parseFloat(getComputedStyle(inner).getPropertyValue('--photoH')) || 15;
-    for (let i = 0; i < 16 && inner.offsetHeight > stage.clientHeight - 8 && size > 1.15; i++) {
-      size *= 0.93; photo *= 0.94;
+    const hasPhoto = !$('card').classList.contains('no-photo');
+    for (let i = 0; i < 24 && inner.offsetHeight > stage.clientHeight - 8 && size > 1.15; i++) {
+      // si riduce prima il testo (fino a un minimo leggibile), poi la foto: la foto è la cosa più importante
+      if (hasPhoto && size > 1.7) size *= 0.93; else { size *= 0.96; photo *= 0.94; }
       dedica.style.setProperty('--dedicaSize', size.toFixed(3) + 'rem');
       inner.style.setProperty('--photoH', photo.toFixed(2) + 'rem');
     }
@@ -580,10 +594,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
     // Dimensione della dedica in base alla lunghezza (più corta = più grande)
     const len = text.length;
     let size = len <= 70 ? 2.9 : len <= 140 ? 2.5 : len <= 220 ? 2.1 : 1.8;
-    if (!hasPhoto) size += 0.5;
+    if (!hasPhoto) size += 0.5; else size -= 0.3;   // con la foto il testo è un po' più piccolo, per lasciarle spazio
     dedica.style.setProperty('--dedicaSize', size + 'rem');
-    inner.style.setProperty('--photoH', (len > 160 ? 12 : 15) + 'rem');
-    setMode('card');
+    inner.style.setProperty('--photoH', (len > 160 ? 21 : 26) + 'rem');
+    setMode('card', hasPhoto);
     updateQueue();
     void $('stage').offsetHeight;   // il piè di pagina si apre prima di misurare
     fitCard();
